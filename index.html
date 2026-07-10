@@ -16,6 +16,9 @@
   <!-- ======= NAVIGATION ======= -->
   <nav class="navbar" id="navbar">
     <div class="nav-container">
+      <!-- OWNER PORTAL LOGIN LINK -->
+      <a href="#" class="owner-portal-btn" id="owner-portal-btn" onclick="toggleOwnerPortal(event)">🔐 Owner Portal</a>
+
       <a href="#home" class="nav-logo" id="nav-logo-link">
         <div class="logo-icon">
           <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -697,6 +700,118 @@
   <button class="scroll-top-btn" id="scroll-top-btn" onclick="scrollToTop()" aria-label="Scroll to top">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
   </button>
+
+  <!-- Owner Login Modal -->
+  <div class="modal-overlay" id="login-modal-overlay" onclick="closeLoginModalOutside(event)">
+    <div class="modal-box auth-box">
+      <button class="modal-close" onclick="closeLoginModal()">✕</button>
+      <h3 class="modal-title">🔐 Owner Portal Login</h3>
+      <form id="owner-login-form" onsubmit="handleOwnerLogin(event)">
+        <div class="form-group">
+          <label for="owner-username">Username</label>
+          <input type="text" id="owner-username" required placeholder="Enter username" />
+        </div>
+        <div class="form-group">
+          <label for="owner-password">Password</label>
+          <input type="password" id="owner-password" required placeholder="Enter password" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full" id="login-submit-btn">Login</button>
+        <div class="error-msg" id="login-error-msg" style="display:none; color:#ff5f57; font-size:0.85rem; margin-top:10px; text-align:center; font-weight:600;">
+          ❌ Invalid username or password!
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Owner Dashboard Modal -->
+  <div class="modal-overlay" id="dashboard-modal-overlay">
+    <div class="modal-box dashboard-box">
+      <div class="dashboard-header">
+        <h3>⚙️ Owner Dashboard</h3>
+        <div class="dashboard-header-actions">
+          <button class="btn btn-ghost btn-sm" onclick="handleOwnerLogout()" id="logout-btn">Logout</button>
+          <button class="modal-close-btn" onclick="closeDashboardModal()" id="close-dash-btn">✕</button>
+        </div>
+      </div>
+      
+      <div class="dashboard-body">
+        <!-- Add Product Column -->
+        <div class="dashboard-column add-column">
+          <h4>➕ Add New Product</h4>
+          <form id="add-product-form" onsubmit="handleAddProduct(event)">
+            <div class="form-group">
+              <label for="prod-name">Product Name</label>
+              <input type="text" id="prod-name" required placeholder="e.g. 4K WiFi Bullet Camera" />
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="prod-cat">Category</label>
+                <select id="prod-cat" required>
+                  <option value="cctv">CCTV Camera</option>
+                  <option value="keyboard">Keyboard</option>
+                  <option value="mouse">Mouse</option>
+                  <option value="computer">Computer</option>
+                  <option value="speaker">Speaker</option>
+                  <option value="accessories">Accessory</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="prod-badge">Badge (Optional)</label>
+                <select id="prod-badge">
+                  <option value="">None</option>
+                  <option value="new">NEW</option>
+                  <option value="hot">HOT</option>
+                  <option value="best">BEST</option>
+                  <option value="sale">SALE</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="prod-price">Selling Price (₹)</label>
+                <input type="number" id="prod-price" required placeholder="3499" min="0" />
+              </div>
+              <div class="form-group">
+                <label for="prod-oldprice">MRP / Old Price (₹)</label>
+                <input type="number" id="prod-oldprice" required placeholder="4999" min="0" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="prod-discount">Discount Tag</label>
+                <input type="text" id="prod-discount" placeholder="e.g. 30% OFF" />
+              </div>
+              <div class="form-group">
+                <label for="prod-stock">Initial Stock</label>
+                <input type="number" id="prod-stock" required value="10" min="0" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="prod-specs">Product Features / Specs (Shown in detail)</label>
+              <input type="text" id="prod-specs" placeholder="e.g. 4K WiFi • IP67 Waterproof" />
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full" id="add-prod-btn">Add Product</button>
+          </form>
+        </div>
+        
+        <!-- Manage Products Column -->
+        <div class="dashboard-column manage-column">
+          <h4>📦 Manage Existing Products</h4>
+          <div class="dashboard-search-wrap">
+            <input type="text" id="dash-search-input" oninput="filterDashboardProducts(this.value)" placeholder="Search products to manage..." />
+          </div>
+          <div class="dashboard-product-list" id="dashboard-product-list">
+            <!-- List items generated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

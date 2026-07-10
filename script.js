@@ -5,7 +5,7 @@
 // =============================================
 // PRODUCT DATA
 // =============================================
-const PRODUCTS = [
+const DEFAULT_PRODUCTS = [
   // CCTV
   {
     id: 1, category: 'cctv',
@@ -215,8 +215,20 @@ const PRODUCTS = [
               <circle cx="66" cy="72" r="3" fill="#febc2e" opacity="0.8"/>
               <path d="M60 30 L60 48" stroke="#FF6B9D" stroke-width="2" stroke-linecap="round"/>
               <text x="60" y="95" text-anchor="middle" fill="#FF6B9D" font-size="10" font-weight="600" font-family="Inter,sans-serif">USB 3.0 • 5Gbps</text>`
-  },
+  }
 ];
+
+// Load products from localStorage or initialize with defaults
+let PRODUCTS = JSON.parse(localStorage.getItem('richit_products'));
+if (!PRODUCTS || PRODUCTS.length === 0) {
+  PRODUCTS = DEFAULT_PRODUCTS.map(p => ({ ...p, stock: 15 }));
+  localStorage.setItem('richit_products', JSON.stringify(PRODUCTS));
+}
+
+function saveProductsState() {
+  localStorage.setItem('richit_products', JSON.stringify(PRODUCTS));
+}
+
 
 // =============================================
 // STATE
@@ -288,13 +300,17 @@ function createProductCard(p) {
           </div>
           <div class="product-discount">${p.discount}</div>
         </div>
+        <!-- STOCK STATUS -->
+        <div class="product-stock-status" style="font-size:0.75rem; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:6px; color:${p.stock > 0 ? '#3ECFCF' : '#ff5f57'};">
+          <span>${p.stock > 0 ? `● In Stock (${p.stock} units)` : `● Out of Stock`}</span>
+        </div>
         <!-- BUY NOW BUTTON (full width, prominent) -->
-        <button class="btn-buy-now" id="buy-now-${p.id}" onclick="buyNow(${p.id})">
+        <button class="btn-buy-now" id="buy-now-${p.id}" onclick="buyNow(${p.id})" ${p.stock <= 0 ? 'disabled style="background:linear-gradient(135deg, #555 0%, #333 100%); cursor:not-allowed; opacity:0.6;"' : ''}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          Buy Now via WhatsApp
+          ${p.stock > 0 ? 'Buy Now via WhatsApp' : 'Out of Stock'}
         </button>
         <div class="product-actions">
-          <button class="btn-add-cart" id="add-cart-${p.id}" onclick="addToCart(${p.id})">
+          <button class="btn-add-cart" id="add-cart-${p.id}" onclick="addToCart(${p.id})" ${p.stock <= 0 ? 'disabled style="background:#555; cursor:not-allowed; opacity:0.6;"' : ''}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
             Add to Cart
           </button>
@@ -402,18 +418,19 @@ function openProductDetail(productId) {
             <div style="font-size:0.8rem;color:#28c840;font-weight:700;margin-top:4px;">You save ₹${savings.toLocaleString('en-IN')} (${p.discount})</div>
           </div>
           <div style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.15);border-radius:12px;padding:14px;margin-bottom:20px;font-size:0.875rem;color:var(--text-secondary);line-height:1.7;">
+            🔥 Stock Available: <strong style="color:${p.stock > 0 ? '#3ECFCF' : '#ff5f57'};">${p.stock > 0 ? `${p.stock} units` : 'Out of Stock'}</strong><br/>
             ✅ Genuine product with manufacturer warranty<br/>
             🚚 Fast delivery available in Safidon & nearby areas<br/>
             🔧 Free installation for CCTV systems<br/>
             💬 Chat with owner for best deal
           </div>
-          <button class="btn-buy-now" style="width:100%;margin-bottom:10px;" onclick="closeProductModal();buyNow(${p.id})">
+          <button class="btn-buy-now" style="width:100%;margin-bottom:10px;" onclick="closeProductModal();buyNow(${p.id})" ${p.stock <= 0 ? 'disabled style="background:linear-gradient(135deg, #555 0%, #333 100%); cursor:not-allowed; opacity:0.6;"' : ''}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            Buy Now via WhatsApp
+            ${p.stock > 0 ? 'Buy Now via WhatsApp' : 'Out of Stock'}
           </button>
-          <button class="btn-add-cart" style="width:100%;" onclick="closeProductModal();addToCart(${p.id})">
+          <button class="btn-add-cart" style="width:100%;" onclick="closeProductModal();addToCart(${p.id})" ${p.stock <= 0 ? 'disabled style="background:#555; cursor:not-allowed; opacity:0.6;"' : ''}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            Add to Cart
+            ${p.stock > 0 ? 'Add to Cart' : 'Out of Stock'}
           </button>
         </div>
       </div>
@@ -451,10 +468,19 @@ function addToCart(productId) {
   const product = PRODUCTS.find(p => p.id === productId);
   if (!product) return;
 
+  if (product.stock <= 0) {
+    showToast(`⚠️ Sorry, ${product.name} is out of stock!`);
+    return;
+  }
+
   const existing = cart.find(i => i.id === productId);
   if (existing) {
+    if (existing.qty >= product.stock) {
+      showToast(`⚠️ Cannot add more! Only ${product.stock} units available in stock.`);
+      return;
+    }
     existing.qty++;
-    showToast(`${product.name} quantity updated!`);
+    showToast(`${product.name} quantity updated in cart!`);
   } else {
     cart.push({ ...product, qty: 1 });
     showToast(`${product.name} added to cart!`);
@@ -526,16 +552,67 @@ function openCart() {
   document.body.style.overflow = 'hidden';
 }
 
+// Function to check if items in cart still have stock
+function validateCartStock() {
+  let changed = false;
+  cart = cart.filter(item => {
+    const p = PRODUCTS.find(prod => prod.id === item.id);
+    if (!p || p.stock <= 0) {
+      changed = true;
+      return false; // Remove item completely if stock is 0
+    }
+    if (item.qty > p.stock) {
+      item.qty = p.stock; // Reduce quantity to available stock
+      changed = true;
+    }
+    return true;
+  });
+  if (changed) {
+    updateCartUI();
+    showToast("⚠️ Cart updated: Some items changed due to stock availability.");
+  }
+}
+
 function toggleCart() {
   const sidebar = document.getElementById('cart-sidebar');
   const overlay = document.getElementById('cart-overlay');
   sidebar.classList.toggle('open');
   overlay.classList.toggle('open');
   document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+  if (sidebar.classList.contains('open')) {
+    validateCartStock();
+  }
 }
 
 function handleCheckout() {
   if (cart.length === 0) return;
+  
+  // Final validation of stock before deducting
+  let outOfStockItems = [];
+  cart.forEach(item => {
+    const p = PRODUCTS.find(prod => prod.id === item.id);
+    if (!p || p.stock < item.qty) {
+      outOfStockItems.push(item.name);
+    }
+  });
+
+  if (outOfStockItems.length > 0) {
+    showToast(`⚠️ Cannot checkout! Out of stock items: ${outOfStockItems.join(', ')}`);
+    validateCartStock();
+    return;
+  }
+
+  // Deduct from stock
+  cart.forEach(item => {
+    const p = PRODUCTS.find(prod => prod.id === item.id);
+    if (p) {
+      p.stock -= item.qty;
+    }
+  });
+
+  saveProductsState();
+  renderProducts(currentFilter);
+
   const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
   showToast(`🎉 Order placed! Total: ₹${total.toLocaleString('en-IN')}. We'll contact you soon!`, 4000);
   cart = [];
@@ -779,6 +856,303 @@ function moveTestimonial(dir) {
 }
 
 // =============================================
+// OWNER PORTAL LOGIC & ACTIONS
+// =============================================
+let isOwnerLoggedIn = false;
+
+function toggleOwnerPortal(e) {
+  if (e) e.preventDefault();
+  if (isOwnerLoggedIn) {
+    openDashboardModal();
+  } else {
+    openLoginModal();
+  }
+}
+
+function openLoginModal() {
+  const modal = document.getElementById('login-modal-overlay');
+  if (modal) modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLoginModal() {
+  const modal = document.getElementById('login-modal-overlay');
+  if (modal) modal.classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('owner-login-form').reset();
+  document.getElementById('login-error-msg').style.display = 'none';
+}
+
+function closeLoginModalOutside(e) {
+  if (e.target === document.getElementById('login-modal-overlay')) {
+    closeLoginModal();
+  }
+}
+
+function handleOwnerLogin(e) {
+  e.preventDefault();
+  const user = document.getElementById('owner-username').value.trim();
+  const pass = document.getElementById('owner-password').value;
+  const errorMsg = document.getElementById('login-error-msg');
+
+  if (user === 'Richit' && pass === 'Richit@1122334455') {
+    isOwnerLoggedIn = true;
+    sessionStorage.setItem('richit_owner_mode', 'true');
+    showToast('🔑 Welcome Richit! Owner portal loaded.');
+    updateOwnerUIState();
+    closeLoginModal();
+    openDashboardModal();
+  } else {
+    errorMsg.style.display = 'block';
+    showToast('❌ Login failed! Try again.');
+  }
+}
+
+function handleOwnerLogout() {
+  isOwnerLoggedIn = false;
+  sessionStorage.removeItem('richit_owner_mode');
+  showToast('🔒 Logged out of Owner Portal.');
+  updateOwnerUIState();
+  closeDashboardModal();
+}
+
+function updateOwnerUIState() {
+  const btn = document.getElementById('owner-portal-btn');
+  if (btn) {
+    if (isOwnerLoggedIn) {
+      btn.innerHTML = '⚙️ Owner Dashboard';
+      btn.classList.add('active');
+    } else {
+      btn.innerHTML = '🔐 Owner Portal';
+      btn.classList.remove('active');
+    }
+  }
+}
+
+function checkOwnerSession() {
+  if (sessionStorage.getItem('richit_owner_mode') === 'true') {
+    isOwnerLoggedIn = true;
+    updateOwnerUIState();
+  }
+}
+
+function openDashboardModal() {
+  const modal = document.getElementById('dashboard-modal-overlay');
+  if (modal) modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderDashboardProducts();
+}
+
+function closeDashboardModal() {
+  const modal = document.getElementById('dashboard-modal-overlay');
+  if (modal) modal.classList.remove('open');
+  document.body.style.overflow = '';
+  document.getElementById('add-product-form').reset();
+}
+
+// Render list of products in the owner panel
+function renderDashboardProducts(filterText = '') {
+  const listContainer = document.getElementById('dashboard-product-list');
+  if (!listContainer) return;
+
+  const query = filterText.toLowerCase().trim();
+  const filtered = PRODUCTS.filter(p => 
+    p.name.toLowerCase().includes(query) || 
+    p.catLabel.toLowerCase().includes(query)
+  );
+
+  if (filtered.length === 0) {
+    listContainer.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-muted); font-size:0.875rem;">No products found</div>';
+    return;
+  }
+
+  listContainer.innerHTML = filtered.map(p => `
+    <div class="dashboard-item">
+      <div class="dash-item-icon">
+        <svg viewBox="0 0 120 120" fill="none">
+          ${p.svgPath}
+        </svg>
+      </div>
+      <div class="dash-item-details">
+        <div class="dash-item-name">${p.name}</div>
+        <div class="dash-item-meta">${p.catLabel} &nbsp;•&nbsp; ₹${p.price.toLocaleString('en-IN')}</div>
+      </div>
+      <div class="dash-item-controls">
+        <div class="dash-stock-control">
+          <button class="dash-stock-btn" onclick="adjustDashboardStock(${p.id}, -1)">−</button>
+          <div class="dash-stock-val" id="dash-stock-val-${p.id}">${p.stock}</div>
+          <button class="dash-stock-btn" onclick="adjustDashboardStock(${p.id}, 1)">+</button>
+        </div>
+        <button class="dash-btn-delete" onclick="deleteDashboardProduct(${p.id})" title="Delete Product">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterDashboardProducts(val) {
+  renderDashboardProducts(val);
+}
+
+// Edit Stock
+function adjustDashboardStock(productId, change) {
+  const p = PRODUCTS.find(prod => prod.id === productId);
+  if (!p) return;
+
+  const newVal = p.stock + change;
+  if (newVal < 0) return;
+
+  p.stock = newVal;
+  saveProductsState();
+
+  // Update dynamic elements instantly
+  const valDisplay = document.getElementById(`dash-stock-val-${productId}`);
+  if (valDisplay) valDisplay.textContent = p.stock;
+
+  // Sync main catalog page & cart check
+  renderProducts(currentFilter);
+  validateCartStock();
+}
+
+// Delete Product
+function deleteDashboardProduct(productId) {
+  const p = PRODUCTS.find(prod => prod.id === productId);
+  if (!p) return;
+
+  if (confirm(`Are you sure you want to delete "${p.name}" completely from the catalog?`)) {
+    PRODUCTS = PRODUCTS.filter(prod => prod.id !== productId);
+    saveProductsState();
+    
+    // Remove from cart/wishlist
+    cart = cart.filter(i => i.id !== productId);
+    wishlist.delete(productId);
+    updateCartUI();
+
+    // Re-render dashboard list & main catalog
+    const searchVal = document.getElementById('dash-search-input').value;
+    renderDashboardProducts(searchVal);
+    renderProducts(currentFilter);
+    showToast(`🗑️ ${p.name} deleted successfully.`);
+  }
+}
+
+// Add Product
+function handleAddProduct(e) {
+  e.preventDefault();
+  
+  const name = document.getElementById('prod-name').value.trim();
+  const category = document.getElementById('prod-cat').value;
+  const badge = document.getElementById('prod-badge').value;
+  const price = parseInt(document.getElementById('prod-price').value);
+  const oldPrice = parseInt(document.getElementById('prod-oldprice').value);
+  const discountText = document.getElementById('prod-discount').value.trim();
+  const stock = parseInt(document.getElementById('prod-stock').value);
+  const specs = document.getElementById('prod-specs').value.trim();
+
+  if (price > oldPrice) {
+    showToast('⚠️ Price cannot be greater than MRP (Old Price)!');
+    return;
+  }
+
+  // Calculate discount tag automatically if empty
+  let discount = discountText;
+  if (!discount) {
+    const calc = Math.round(((oldPrice - price) / oldPrice) * 100);
+    discount = calc > 0 ? `${calc}% OFF` : '';
+  }
+
+  // Map category code to labels
+  const catLabels = {
+    cctv: 'CCTV Camera',
+    keyboard: 'Keyboard',
+    mouse: 'Mouse',
+    computer: 'Desktop PC',
+    speaker: 'Speaker',
+    accessories: 'Accessory'
+  };
+  const catLabel = catLabels[category] || 'Tech Product';
+
+  // SVG preset generator based on category selection
+  let svgBg = '';
+  let svgPath = '';
+  if (category === 'cctv') {
+    svgBg = 'rgba(108,99,255,0.08)';
+    svgPath = `<ellipse cx="60" cy="55" rx="30" ry="30" fill="rgba(108,99,255,0.2)" stroke="#6C63FF" stroke-width="2"/>
+              <ellipse cx="60" cy="55" rx="16" ry="16" fill="#6C63FF" opacity="0.5"/>
+              <circle cx="60" cy="55" r="7" fill="#6C63FF"/>
+              <path d="M90 55h20l12-15v30l-12-15" fill="none" stroke="#6C63FF" stroke-width="3" stroke-linejoin="round"/>
+              <text x="60" y="110" text-anchor="middle" fill="#6C63FF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || '4K • Dome'}</text>`;
+  } else if (category === 'keyboard') {
+    svgBg = 'rgba(62,207,207,0.08)';
+    svgPath = `<rect x="10" y="38" width="100" height="50" rx="6" fill="rgba(62,207,207,0.12)" stroke="#3ECFCF" stroke-width="2"/>
+              <rect x="25" y="48" width="15" height="10" rx="2" fill="#3ECFCF" opacity="0.7"/>
+              <rect x="45" y="48" width="15" height="10" rx="2" fill="#6C63FF" opacity="0.7"/>
+              <rect x="65" y="48" width="15" height="10" rx="2" fill="#FF6B9D" opacity="0.7"/>
+              <rect x="85" y="48" width="15" height="10" rx="2" fill="#F7C948" opacity="0.7"/>
+              <rect x="35" y="65" width="50" height="10" rx="3" fill="#3ECFCF" opacity="0.5"/>
+              <text x="60" y="105" text-anchor="middle" fill="#3ECFCF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Mechanical'}</text>`;
+  } else if (category === 'mouse') {
+    svgBg = 'rgba(255,107,157,0.08)';
+    svgPath = `<path d="M35 35 Q60 28 85 35 L90 80 Q60 95 30 80 Z" fill="rgba(255,107,157,0.15)" stroke="#FF6B9D" stroke-width="2"/>
+              <line x1="60" y1="28" x2="60" y2="65" stroke="#FF6B9D" stroke-width="2" opacity="0.7"/>
+              <ellipse cx="60" cy="48" rx="10" ry="6" fill="rgba(255,107,157,0.4)"/>
+              <circle cx="60" cy="80" r="4" fill="#FF6B9D"/>
+              <text x="60" y="108" text-anchor="middle" fill="#FF6B9D" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Gaming Mouse'}</text>`;
+  } else if (category === 'computer') {
+    svgBg = 'rgba(247,201,72,0.08)';
+    svgPath = `<rect x="15" y="22" width="90" height="58" rx="5" fill="rgba(247,201,72,0.12)" stroke="#F7C948" stroke-width="2"/>
+              <rect x="22" y="28" width="76" height="46" rx="2" fill="#0a0a12"/>
+              <rect x="45" y="80" width="30" height="5" rx="2" fill="#F7C948" opacity="0.4"/>
+              <rect x="50" y="85" width="20" height="4" rx="2" fill="#F7C948" opacity="0.3"/>
+              <text x="60" y="108" text-anchor="middle" fill="#F7C948" font-size="9" font-weight="600" font-family="Inter,sans-serif">${specs || 'Intel Core PC'}</text>`;
+  } else if (category === 'speaker') {
+    svgBg = 'rgba(62,207,207,0.08)';
+    svgPath = `<rect x="25" y="20" width="70" height="75" rx="6" fill="rgba(62,207,207,0.12)" stroke="#3ECFCF" stroke-width="2"/>
+              <circle cx="60" cy="45" r="15" fill="none" stroke="#3ECFCF" stroke-width="2"/>
+              <circle cx="60" cy="45" r="6" fill="#3ECFCF" opacity="0.5"/>
+              <circle cx="60" cy="78" r="8" fill="none" stroke="#3ECFCF" stroke-width="1.5"/>
+              <text x="60" y="110" text-anchor="middle" fill="#3ECFCF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Desktop Audio'}</text>`;
+  } else {
+    svgBg = 'rgba(255,107,157,0.08)';
+    svgPath = `<circle cx="60" cy="50" r="20" stroke="#FF6B9D" stroke-width="2" fill="none"/>
+              <circle cx="60" cy="50" r="8" fill="#FF6B9D" opacity="0.4"/>
+              <path d="M60 18v12M60 70v12M28 50h12M80 50h12" stroke="#FF6B9D" stroke-width="2.5" stroke-linecap="round"/>
+              <text x="60" y="105" text-anchor="middle" fill="#FF6B9D" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'PC Hub Gear'}</text>`;
+  }
+
+  // Create a new product entry
+  const newId = PRODUCTS.length > 0 ? Math.max(...PRODUCTS.map(p => p.id)) + 1 : 1;
+  const newProduct = {
+    id: newId,
+    category,
+    name,
+    catLabel,
+    price,
+    oldPrice,
+    discount,
+    rating: 5.0, // default rating for added items
+    reviews: 0,   // default review count
+    badge: badge || 'new',
+    svgBg,
+    svgPath,
+    stock
+  };
+
+  PRODUCTS.push(newProduct);
+  saveProductsState();
+
+  // Reset Add form, success confirmation
+  document.getElementById('add-product-form').reset();
+  showToast(`✅ Added "${name}" successfully!`);
+
+  // Reload views
+  const searchVal = document.getElementById('dash-search-input').value;
+  renderDashboardProducts(searchVal);
+  renderProducts(currentFilter);
+}
+
+// =============================================
 // CONTACT FORM
 // =============================================
 function handleFormSubmit(e) {
@@ -804,6 +1178,7 @@ function handleFormSubmit(e) {
 // INIT
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
+  checkOwnerSession();
   renderProducts('all');
   initNavbar();
   initSearch();

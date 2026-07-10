@@ -305,73 +305,134 @@ body {
 .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 .stat-divider { width: 1px; height: 40px; background: var(--border); }
 
-/* ---- Hero Visual ---- */
+/* ---- Hero Visual – Owner Photo ---- */
 .hero-visual { display: flex; justify-content: center; align-items: center; }
-.hero-monitor-scene { position: relative; }
-.monitor-frame {
-  background: #1a1a2e; border: 2px solid rgba(108,99,255,0.3);
-  border-radius: 14px; padding: 12px; box-shadow: var(--shadow-hover);
+.hero-owner-scene {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 20px;
+}
+
+/* Glow & Rings */
+.hero-owner-glow {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 320px; height: 320px;
+  background: radial-gradient(circle, rgba(108,99,255,0.4) 0%, transparent 70%);
+  border-radius: 50%; z-index: 0; pointer-events: none;
+  animation: glowPulse 3s ease-in-out infinite;
+}
+.hero-owner-ring {
+  position: absolute; border-radius: 50%; pointer-events: none;
+  animation: ringExpand 3.5s ease-in-out infinite;
+}
+.ring-a {
+  top: -24px; left: 50%; transform: translateX(-50%);
+  width: 308px; height: 308px;
+  border: 1px solid rgba(108,99,255,0.3);
+}
+.ring-b {
+  top: -46px; left: 50%; transform: translateX(-50%);
+  width: 352px; height: 352px;
+  border: 1px solid rgba(62,207,207,0.15);
+  animation-delay: 1s;
+}
+
+/* Owner Photo */
+.hero-owner-photo-wrap {
+  position: relative; z-index: 2;
+  width: 260px; height: 300px;
+  border-radius: 28px; overflow: hidden;
+  border: 3px solid rgba(108,99,255,0.5);
+  box-shadow:
+    0 0 0 8px rgba(108,99,255,0.1),
+    0 20px 60px rgba(0,0,0,0.55),
+    0 0 40px rgba(108,99,255,0.25);
   animation: monitorFloat 4s ease-in-out infinite;
 }
-@keyframes monitorFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+.hero-owner-photo {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center top;
+  display: block; transition: transform 0.5s ease;
 }
-.monitor-screen {
-  width: 340px; height: 220px;
-  background: #0a0a12; border-radius: 8px; overflow: hidden;
-}
-.screen-content { padding: 12px; height: 100%; display: flex; flex-direction: column; }
-.screen-top-bar { display: flex; gap: 6px; margin-bottom: 12px; }
-.screen-dot { width: 10px; height: 10px; border-radius: 50%; }
-.screen-dot.red { background: #ff5f57; }
-.screen-dot.yellow { background: #febc2e; }
-.screen-dot.green { background: #28c840; }
-.cctv-grid {
-  flex: 1; display: grid; grid-template-columns: 1fr 1fr;
-  gap: 6px; margin-bottom: 10px;
-}
-.cam-feed {
-  background: #0d1117; border: 1px solid rgba(108,99,255,0.2);
-  border-radius: 4px; position: relative; overflow: hidden;
-  display: flex; align-items: flex-end; padding: 4px;
-}
-.cam-feed::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(108,99,255,0.05), rgba(62,207,207,0.05));
-}
-.cam-1::after { content: ''; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: #28c840; border-radius: 50%; animation: blink 2s infinite; }
-.cam-2::after { content: ''; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: #28c840; border-radius: 50%; animation: blink 2.5s infinite 0.5s; }
-.cam-3::after { content: ''; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: #febc2e; border-radius: 50%; animation: blink 3s infinite 1s; }
-.cam-4::after { content: ''; position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: #28c840; border-radius: 50%; animation: blink 1.8s infinite 0.3s; }
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-.cam-label { font-size: 0.6rem; color: rgba(108,99,255,0.8); font-weight: 600; letter-spacing: 1px; position: relative; z-index: 1; }
-.cam-activity { position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #6C63FF, #3ECFCF); animation: scanLine 3s linear infinite; }
-@keyframes scanLine { 0% { opacity: 1; transform: scaleX(0); transform-origin: left; } 50% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1); } }
-.screen-status {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 0.62rem; color: #28c840; font-weight: 600; letter-spacing: 1px;
-}
-.status-dot { width: 6px; height: 6px; background: #28c840; border-radius: 50%; animation: blink 1.5s infinite; }
-.monitor-stand { width: 80px; height: 20px; background: #1a1a2e; margin: 0 auto; border-radius: 0 0 4px 4px; border: 2px solid rgba(108,99,255,0.2); border-top: none; }
-.monitor-base { width: 140px; height: 8px; background: #1a1a2e; margin: 0 auto; border-radius: 4px; border: 2px solid rgba(108,99,255,0.2); }
+.hero-owner-photo-wrap:hover .hero-owner-photo { transform: scale(1.05); }
 
-/* Floating Cards */
+/* Hero Nameplate */
+.hero-nameplate {
+  position: relative; z-index: 2;
+  width: 280px;
+  background: linear-gradient(135deg, #c8a436 0%, #f5d06e 30%, #e8b830 55%, #fce97a 70%, #c8a436 100%);
+  border-radius: var(--radius-md);
+  padding: 16px 24px;
+  box-shadow:
+    0 4px 0 #8a6d0f,
+    0 8px 24px rgba(200,164,54,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  border: 1px solid rgba(200,164,54,0.8);
+  animation: cardFloat2 5s ease-in-out infinite;
+}
+.hero-nameplate-screws {
+  position: absolute; inset: 8px; pointer-events: none;
+}
+.hero-nameplate-screws .screw {
+  position: absolute;
+  width: 9px; height: 9px;
+  background: radial-gradient(circle at 35% 35%, #f0c040, #8a6d0f);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.3);
+}
+.hero-nameplate-screws .screw:nth-child(1) { top: 0; left: 0; }
+.hero-nameplate-screws .screw:nth-child(2) { top: 0; right: 0; }
+.hero-nameplate-screws .screw:nth-child(3) { bottom: 0; left: 0; }
+.hero-nameplate-screws .screw:nth-child(4) { bottom: 0; right: 0; }
+.hero-nameplate-screws .screw::before,
+.hero-nameplate-screws .screw::after {
+  content: ''; position: absolute; top: 50%; left: 50%;
+  background: rgba(0,0,0,0.4); border-radius: 1px;
+}
+.hero-nameplate-screws .screw::before { width: 5px; height: 1px; transform: translate(-50%,-50%); }
+.hero-nameplate-screws .screw::after  { width: 1px; height: 5px; transform: translate(-50%,-50%); }
+
+.hero-nameplate-inner { text-align: center; }
+.hero-np-shop {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.62rem; font-weight: 800;
+  letter-spacing: 3.5px; text-transform: uppercase;
+  color: #5a3a00; margin-bottom: 6px;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+}
+.hero-np-divider {
+  width: 75%; height: 1.5px; margin: 5px auto 6px;
+  background: linear-gradient(90deg, transparent, #8a6d0f, transparent);
+}
+.hero-np-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.7rem; font-weight: 900;
+  color: #3a2000;
+  text-shadow: 0 2px 0 rgba(255,255,255,0.45), 0 -1px 0 rgba(0,0,0,0.15);
+  letter-spacing: 1px; line-height: 1.1; margin-bottom: 3px;
+}
+.hero-np-role {
+  font-size: 0.66rem; font-weight: 700;
+  color: #6b4400; letter-spacing: 1.8px; text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+}
+
+/* Floating Cards – repositioned for owner scene */
 .floating-card {
   position: absolute; background: rgba(20,20,35,0.95);
   border: 1px solid rgba(108,99,255,0.25); border-radius: var(--radius-md);
   padding: 12px 16px; display: flex; align-items: center; gap: 10px;
   backdrop-filter: blur(10px); box-shadow: var(--shadow-card);
-  min-width: 160px;
+  min-width: 150px;
 }
 .floating-card .card-title { font-size: 0.78rem; font-weight: 600; color: var(--text-primary); }
 .floating-card .card-sub { font-size: 0.68rem; color: var(--text-muted); margin-top: 1px; }
-.card-1 { top: 20px; left: -120px; animation: cardFloat1 5s ease-in-out infinite; }
-.card-2 { top: -20px; right: -110px; animation: cardFloat2 6s ease-in-out infinite 1s; }
-.card-3 { bottom: 30px; left: -100px; animation: cardFloat1 7s ease-in-out infinite 2s; }
+.card-1 { top: 30px; left: -140px; animation: cardFloat1 5s ease-in-out infinite; }
+.card-2 { top: 10px; right: -130px; animation: cardFloat2 6s ease-in-out infinite 1s; }
+.card-3 { bottom: 60px; left: -130px; animation: cardFloat1 7s ease-in-out infinite 2s; }
 @keyframes cardFloat1 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 @keyframes cardFloat2 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
 
 .scroll-indicator {
   position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);

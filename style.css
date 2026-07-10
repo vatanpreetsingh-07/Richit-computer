@@ -582,6 +582,12 @@ body {
 }
 .product-card:hover .product-img-bg { transform: scale(1.05); }
 .product-svg { width: 120px; height: 120px; position: relative; z-index: 1; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3)); }
+.product-img-element {
+  max-width: 100%; max-height: 100%; width: auto; height: auto;
+  object-fit: contain; position: relative; z-index: 1;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+  border-radius: 8px;
+}
 
 .product-info { padding: 20px; }
 .product-cat {

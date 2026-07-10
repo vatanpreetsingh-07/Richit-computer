@@ -218,6 +218,28 @@ const DEFAULT_PRODUCTS = [
   }
 ];
 
+// =============================================
+// CATEGORIES DATA & STATE
+// =============================================
+const DEFAULT_CATEGORIES = [
+  { id: 'cctv', name: 'CCTV Camera', desc: 'HD & 4K security dome & bullet cameras', svgBg: 'rgba(108,99,255,0.08)', svgPath: `<circle cx="32" cy="32" r="30" fill="url(#cctvGrad)" opacity="0.15"/><ellipse cx="26" cy="32" rx="10" ry="10" stroke="#6C63FF" stroke-width="2.5"/><ellipse cx="26" cy="32" rx="5" ry="5" fill="#6C63FF" opacity="0.5"/><circle cx="26" cy="32" r="2" fill="#6C63FF"/><path d="M36 32h10l5-6v12l-5-6" stroke="#6C63FF" stroke-width="2.5" stroke-linejoin="round"/><path d="M16 20v-4h-4v4" stroke="#3ECFCF" stroke-width="2" stroke-linecap="round"/><defs><linearGradient id="cctvGrad" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#6C63FF"/><stop offset="1" stop-color="#3ECFCF"/></linearGradient></defs>` },
+  { id: 'keyboard', name: 'Keyboards', desc: 'Mechanical, membrane & gaming keyboards for every need', svgBg: 'rgba(62,207,207,0.08)', svgPath: `<rect x="6" y="18" width="52" height="28" rx="5" fill="url(#kbGrad)" opacity="0.15" stroke="#3ECFCF" stroke-width="2"/><rect x="12" y="24" width="6" height="5" rx="1.5" fill="#3ECFCF" opacity="0.7"/><rect x="21" y="24" width="6" height="5" rx="1.5" fill="#3ECFCF" opacity="0.7"/><rect x="30" y="24" width="6" height="5" rx="1.5" fill="#3ECFCF" opacity="0.7"/><rect x="39" y="24" width="6" height="5" rx="1.5" fill="#3ECFCF" opacity="0.7"/><rect x="48" y="24" width="6" height="5" rx="1.5" fill="#3ECFCF" opacity="0.7"/><rect x="14" y="32" width="5" height="5" rx="1.5" fill="#6C63FF" opacity="0.7"/><rect x="22" y="32" width="5" height="5" rx="1.5" fill="#6C63FF" opacity="0.7"/><rect x="30" y="32" width="5" height="5" rx="1.5" fill="#6C63FF" opacity="0.7"/><rect x="38" y="32" width="5" height="5" rx="1.5" fill="#6C63FF" opacity="0.7"/><rect x="46" y="32" width="5" height="5" rx="1.5" fill="#6C63FF" opacity="0.7"/><rect x="16" y="40" width="32" height="5" rx="2.5" fill="#FF6B9D" opacity="0.6"/><defs><linearGradient id="kbGrad" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#3ECFCF"/><stop offset="1" stop-color="#6C63FF"/></linearGradient></defs>` },
+  { id: 'mouse', name: 'Mice', desc: 'Ergonomic, wireless & gaming mice for precision control', svgBg: 'rgba(255,107,157,0.08)', svgPath: `<rect x="18" y="12" width="28" height="40" rx="14" fill="url(#mouseGrad)" opacity="0.15" stroke="#FF6B9D" stroke-width="2"/><line x1="32" y1="12" x2="32" y2="36" stroke="#FF6B9D" stroke-width="2"/><ellipse cx="32" cy="26" rx="5" ry="3" fill="#FF6B9D" opacity="0.5"/><circle cx="32" cy="44" r="3" fill="#FF6B9D" opacity="0.7"/><defs><linearGradient id="mouseGrad" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#FF6B9D"/><stop offset="1" stop-color="#6C63FF"/></linearGradient></defs>` },
+  { id: 'computer', name: 'Computers', desc: 'Desktop PCs, all-in-ones & workstations for every budget', svgBg: 'rgba(247,201,72,0.08)', svgPath: `<rect x="8" y="10" width="48" height="32" rx="4" fill="url(#pcGrad)" opacity="0.15" stroke="#F7C948" stroke-width="2"/><rect x="14" y="16" width="36" height="20" rx="2" fill="#1a1a2e"/><path d="M18 20h4M26 20h4M34 20h4" stroke="#F7C948" stroke-width="1.5" stroke-linecap="round"/><path d="M18 25h10M32 25h6" stroke="#6C63FF" stroke-width="1.5" stroke-linecap="round"/><path d="M18 30h6M28 30h4M36 30h2" stroke="#3ECFCF" stroke-width="1.5" stroke-linecap="round"/><path d="M24 42h16v4H24z" fill="#F7C948" opacity="0.5" rx="2"/><path d="M28 42v4" stroke="#F7C948" stroke-width="1"/><path d="M36 42v4" stroke="#F7C948" stroke-width="1"/><rect x="8" y="46" width="48" height="8" rx="2" fill="#F7C948" opacity="0.2" stroke="#F7C948" stroke-width="1.5"/><defs><linearGradient id="pcGrad" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#F7C948"/><stop offset="1" stop-color="#FF6B9D"/></linearGradient></defs>` },
+  { id: 'speaker', name: 'Speakers', desc: 'Crystal-clear audio from desktop speakers to surround systems', svgBg: 'rgba(62,207,207,0.08)', svgPath: `<rect x="10" y="8" width="24" height="48" rx="5" fill="url(#spGrad)" opacity="0.15" stroke="#3ECFCF" stroke-width="2"/><circle cx="22" cy="28" r="9" stroke="#3ECFCF" stroke-width="2"/><circle cx="22" cy="28" r="4" fill="#3ECFCF" opacity="0.5"/><circle cx="22" cy="48" r="4" stroke="#3ECFCF" stroke-width="1.5"/><circle cx="22" cy="48" r="1.5" fill="#3ECFCF"/><path d="M40 20c4 3 4 21 0 24" stroke="#6C63FF" stroke-width="2.5" stroke-linecap="round"/><path d="M46 14c7 6 7 30 0 36" stroke="#6C63FF" stroke-width="2" stroke-linecap="round" opacity="0.5"/><defs><linearGradient id="spGrad" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#3ECFCF"/><stop offset="1" stop-color="#6C63FF"/></linearGradient></defs>` },
+  { id: 'accessories', name: 'Accessories', desc: 'Cables, hubs, cooling pads, bags & essential PC gear', svgBg: 'rgba(255,107,157,0.08)', svgPath: `<circle cx="32" cy="32" r="12" stroke="#FF6B9D" stroke-width="2"/><circle cx="32" cy="32" r="5" fill="#FF6B9D" opacity="0.4"/><path d="M32 8v8M32 48v8M8 32h8M48 32h8" stroke="#FF6B9D" stroke-width="2.5" stroke-linecap="round"/><path d="M16.9 16.9l5.7 5.7M41.4 41.4l5.7 5.7M16.9 47.1l5.7-5.7M41.4 22.6l5.7-5.7" stroke="#6C63FF" stroke-width="2" stroke-linecap="round"/><defs><linearGradient id="accGrad" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#FF6B9D"/><stop offset="1" stop-color="#6C63FF"/></linearGradient></defs>` }
+];
+
+let CATEGORIES = JSON.parse(localStorage.getItem('richit_categories'));
+if (!CATEGORIES || CATEGORIES.length === 0) {
+  CATEGORIES = DEFAULT_CATEGORIES;
+  localStorage.setItem('richit_categories', JSON.stringify(CATEGORIES));
+}
+
+function saveCategoriesState() {
+  localStorage.setItem('richit_categories', JSON.stringify(CATEGORIES));
+}
+
 // Load products from localStorage or initialize with defaults
 let PRODUCTS = JSON.parse(localStorage.getItem('richit_products'));
 if (!PRODUCTS || PRODUCTS.length === 0) {
@@ -279,9 +301,13 @@ function createProductCard(p) {
       <div class="product-badge ${badgeClass}">${badgeLabels[p.badge]}</div>
       <div class="product-img-wrap" onclick="openProductDetail(${p.id})" style="cursor:pointer;">
         <div class="product-img-bg" style="background: ${p.svgBg};"></div>
-        <svg class="product-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-          ${p.svgPath}
-        </svg>
+        ${p.image ? `
+          <img src="${p.image}" class="product-img-element" alt="${p.name}" />
+        ` : `
+          <svg class="product-svg" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            ${p.svgPath}
+          </svg>
+        `}
         <div class="product-img-overlay">
           <span class="overlay-eye">👁 Quick View</span>
         </div>
@@ -399,10 +425,14 @@ function openProductDetail(productId) {
       <button class="product-modal-close" onclick="closeProductModal()">✕</button>
       <div class="product-modal-grid">
         <div class="product-modal-img">
-          <div style="background:${p.svgBg}; width:100%; height:100%; display:flex; align-items:center; justify-content:center; border-radius:16px;">
-            <svg width="200" height="200" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-              ${p.svgPath}
-            </svg>
+          <div style="background:${p.svgBg}; width:100%; height:100%; display:flex; align-items:center; justify-content:center; border-radius:16px; padding:20px;">
+            ${p.image ? `
+              <img src="${p.image}" class="product-img-element" style="max-height:220px;" alt="${p.name}" />
+            ` : `
+              <svg width="200" height="200" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                ${p.svgPath}
+              </svg>
+            `}
           </div>
         </div>
         <div class="product-modal-info">
@@ -909,10 +939,6 @@ function handleOwnerLogin(e) {
 }
 
 function handleOwnerLogout() {
-  isOwnerLoggedIn = false;
-  sessionStorage.removeItem('richit_owner_mode');
-  showToast('🔒 Logged out of Owner Portal.');
-  updateOwnerUIState();
   closeDashboardModal();
 }
 
@@ -945,9 +971,33 @@ function openDashboardModal() {
 
 function closeDashboardModal() {
   const modal = document.getElementById('dashboard-modal-overlay');
-  if (modal) modal.classList.remove('open');
-  document.body.style.overflow = '';
-  document.getElementById('add-product-form').reset();
+  if (modal && modal.classList.contains('open')) {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+    
+    // Reset forms
+    document.getElementById('add-product-form').reset();
+    document.getElementById('add-category-form').reset();
+    
+    // Reset view toggle state back to products
+    const productsPanel = document.getElementById('dash-products-panel');
+    const categoriesPanel = document.getElementById('dash-categories-panel');
+    const toggleBtn = document.getElementById('toggle-dash-view-btn');
+    if (productsPanel) productsPanel.style.display = 'grid';
+    if (categoriesPanel) categoriesPanel.style.display = 'none';
+    if (toggleBtn) toggleBtn.innerHTML = '📁 Manage Categories';
+
+    // Clear session & log out automatically
+    if (isOwnerLoggedIn) {
+      isOwnerLoggedIn = false;
+      sessionStorage.removeItem('richit_owner_mode');
+      updateOwnerUIState();
+      showToast('🔒 Dashboard closed & logged out.');
+      
+      // Refresh views to clean up
+      renderProducts(currentFilter);
+    }
+  }
 }
 
 // Render list of products in the owner panel
@@ -969,13 +1019,17 @@ function renderDashboardProducts(filterText = '') {
   listContainer.innerHTML = filtered.map(p => `
     <div class="dashboard-item">
       <div class="dash-item-icon">
-        <svg viewBox="0 0 120 120" fill="none">
-          ${p.svgPath}
-        </svg>
+        ${p.image ? `
+          <img src="${p.image}" style="width:100%; height:100%; object-fit:cover; border-radius:4px;" />
+        ` : `
+          <svg viewBox="0 0 120 120" fill="none">
+            ${p.svgPath}
+          </svg>
+        `}
       </div>
       <div class="dash-item-details">
         <div class="dash-item-name">${p.name}</div>
-        <div class="dash-item-meta">${p.catLabel} &nbsp;•&nbsp; ₹${p.price.toLocaleString('en-IN')}</div>
+        <div class="dash-item-meta">${p.catLabel} &nbsp;•&nbsp; ₹${p.price.toLocaleString('en-IN')} &nbsp;•&nbsp; Stock: ${p.stock}</div>
       </div>
       <div class="dash-item-controls">
         <div class="dash-stock-control">
@@ -983,6 +1037,10 @@ function renderDashboardProducts(filterText = '') {
           <div class="dash-stock-val" id="dash-stock-val-${p.id}">${p.stock}</div>
           <button class="dash-stock-btn" onclick="adjustDashboardStock(${p.id}, 1)">+</button>
         </div>
+        <!-- Edit details button -->
+        <button class="dash-btn-edit" onclick="openEditModal(${p.id})" title="Edit Product Details" style="background:rgba(62,207,207,0.1); border:1px solid rgba(62,207,207,0.25); color:#3ECFCF; width:32px; height:32px; border-radius:var(--radius-sm); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:var(--transition);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </button>
         <button class="dash-btn-delete" onclick="deleteDashboardProduct(${p.id})" title="Delete Product">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
         </button>
@@ -1037,10 +1095,53 @@ function deleteDashboardProduct(productId) {
   }
 }
 
-// Add Product
+// Helper to compress and resize images using HTML5 Canvas to fit in LocalStorage
+function compressImage(file, callback) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 300;
+      const MAX_HEIGHT = 300;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      // Compress to JPEG at 70% quality
+      const base64Data = canvas.toDataURL('image/jpeg', 0.7);
+      callback(base64Data);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// Add Product with Mandatory Photo Upload
 function handleAddProduct(e) {
   e.preventDefault();
   
+  const photoInput = document.getElementById('prod-photo');
+  if (!photoInput.files || photoInput.files.length === 0) {
+    showToast('⚠️ Product photo is mandatory!');
+    return;
+  }
+
   const name = document.getElementById('prod-name').value.trim();
   const category = document.getElementById('prod-cat').value;
   const badge = document.getElementById('prod-badge').value;
@@ -1055,14 +1156,182 @@ function handleAddProduct(e) {
     return;
   }
 
-  // Calculate discount tag automatically if empty
+  // Compress image, then insert product
+  compressImage(photoInput.files[0], function(base64Image) {
+    // Calculate discount tag automatically if empty
+    let discount = discountText;
+    if (!discount) {
+      const calc = Math.round(((oldPrice - price) / oldPrice) * 100);
+      discount = calc > 0 ? `${calc}% OFF` : '';
+    }
+
+    // Map category code to labels
+    const catLabels = {
+      cctv: 'CCTV Camera',
+      keyboard: 'Keyboard',
+      mouse: 'Mouse',
+      computer: 'Desktop PC',
+      speaker: 'Speaker',
+      accessories: 'Accessory'
+    };
+    const catLabel = catLabels[category] || 'Tech Product';
+
+    // SVG preset generator based on category selection (fallback)
+    let svgBg = '';
+    let svgPath = '';
+    if (category === 'cctv') {
+      svgBg = 'rgba(108,99,255,0.08)';
+      svgPath = `<ellipse cx="60" cy="55" rx="30" ry="30" fill="rgba(108,99,255,0.2)" stroke="#6C63FF" stroke-width="2"/>
+                <ellipse cx="60" cy="55" rx="16" ry="16" fill="#6C63FF" opacity="0.5"/>
+                <circle cx="60" cy="55" r="7" fill="#6C63FF"/>
+                <path d="M90 55h20l12-15v30l-12-15" fill="none" stroke="#6C63FF" stroke-width="3" stroke-linejoin="round"/>
+                <text x="60" y="110" text-anchor="middle" fill="#6C63FF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || '4K • Dome'}</text>`;
+    } else if (category === 'keyboard') {
+      svgBg = 'rgba(62,207,207,0.08)';
+      svgPath = `<rect x="10" y="38" width="100" height="50" rx="6" fill="rgba(62,207,207,0.12)" stroke="#3ECFCF" stroke-width="2"/>
+                <rect x="25" y="48" width="15" height="10" rx="2" fill="#3ECFCF" opacity="0.7"/>
+                <rect x="45" y="48" width="15" height="10" rx="2" fill="#6C63FF" opacity="0.7"/>
+                <rect x="65" y="48" width="15" height="10" rx="2" fill="#FF6B9D" opacity="0.7"/>
+                <rect x="85" y="48" width="15" height="10" rx="2" fill="#F7C948" opacity="0.7"/>
+                <rect x="35" y="65" width="50" height="10" rx="3" fill="#3ECFCF" opacity="0.5"/>
+                <text x="60" y="105" text-anchor="middle" fill="#3ECFCF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Mechanical'}</text>`;
+    } else if (category === 'mouse') {
+      svgBg = 'rgba(255,107,157,0.08)';
+      svgPath = `<path d="M35 35 Q60 28 85 35 L90 80 Q60 95 30 80 Z" fill="rgba(255,107,157,0.15)" stroke="#FF6B9D" stroke-width="2"/>
+                <line x1="60" y1="28" x2="60" y2="65" stroke="#FF6B9D" stroke-width="2" opacity="0.7"/>
+                <ellipse cx="60" cy="48" rx="10" ry="6" fill="rgba(255,107,157,0.4)"/>
+                <circle cx="60" cy="80" r="4" fill="#FF6B9D"/>
+                <text x="60" y="108" text-anchor="middle" fill="#FF6B9D" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Gaming Mouse'}</text>`;
+    } else if (category === 'computer') {
+      svgBg = 'rgba(247,201,72,0.08)';
+      svgPath = `<rect x="15" y="22" width="90" height="58" rx="5" fill="rgba(247,201,72,0.12)" stroke="#F7C948" stroke-width="2"/>
+                <rect x="22" y="28" width="76" height="46" rx="2" fill="#0a0a12"/>
+                <rect x="45" y="80" width="30" height="5" rx="2" fill="#F7C948" opacity="0.4"/>
+                <rect x="50" y="85" width="20" height="4" rx="2" fill="#F7C948" opacity="0.3"/>
+                <text x="60" y="108" text-anchor="middle" fill="#F7C948" font-size="9" font-weight="600" font-family="Inter,sans-serif">${specs || 'Intel Core PC'}</text>`;
+    } else if (category === 'speaker') {
+      svgBg = 'rgba(62,207,207,0.08)';
+      svgPath = `<rect x="25" y="20" width="70" height="75" rx="6" fill="rgba(62,207,207,0.12)" stroke="#3ECFCF" stroke-width="2"/>
+                <circle cx="60" cy="45" r="15" fill="none" stroke="#3ECFCF" stroke-width="2"/>
+                <circle cx="60" cy="45" r="6" fill="#3ECFCF" opacity="0.5"/>
+                <circle cx="60" cy="78" r="8" fill="none" stroke="#3ECFCF" stroke-width="1.5"/>
+                <text x="60" y="110" text-anchor="middle" fill="#3ECFCF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Desktop Audio'}</text>`;
+    } else {
+      svgBg = 'rgba(255,107,157,0.08)';
+      svgPath = `<circle cx="60" cy="50" r="20" stroke="#FF6B9D" stroke-width="2" fill="none"/>
+                <circle cx="60" cy="50" r="8" fill="#FF6B9D" opacity="0.4"/>
+                <path d="M60 18v12M60 70v12M28 50h12M80 50h12" stroke="#FF6B9D" stroke-width="2.5" stroke-linecap="round"/>
+                <text x="60" y="105" text-anchor="middle" fill="#FF6B9D" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'PC Hub Gear'}</text>`;
+    }
+
+    // Create a new product entry
+    const newId = PRODUCTS.length > 0 ? Math.max(...PRODUCTS.map(p => p.id)) + 1 : 1;
+    const newProduct = {
+      id: newId,
+      category,
+      name,
+      catLabel,
+      price,
+      oldPrice,
+      discount,
+      rating: 5.0, // default rating for added items
+      reviews: 0,   // default review count
+      badge: badge || 'new',
+      svgBg,
+      svgPath,
+      stock,
+      image: base64Image // Store custom resized image base64
+    };
+
+    PRODUCTS.push(newProduct);
+    saveProductsState();
+
+    // Reset Add form, success confirmation
+    document.getElementById('add-product-form').reset();
+    showToast(`✅ Added "${name}" successfully!`);
+
+    // Reload views
+    const searchVal = document.getElementById('dash-search-input').value;
+    renderDashboardProducts(searchVal);
+    renderProducts(currentFilter);
+  });
+}
+
+// =============================================
+// EDIT PRODUCT FLOW
+// =============================================
+function openEditModal(productId) {
+  const p = PRODUCTS.find(prod => prod.id === productId);
+  if (!p) return;
+
+  document.getElementById('edit-prod-id').value = p.id;
+  document.getElementById('edit-prod-name').value = p.name;
+  document.getElementById('edit-prod-cat').value = p.category;
+  document.getElementById('edit-prod-badge').value = p.badge || '';
+  document.getElementById('edit-prod-price').value = p.price;
+  document.getElementById('edit-prod-oldprice').value = p.oldPrice;
+  document.getElementById('edit-prod-discount').value = p.discount || '';
+  document.getElementById('edit-prod-stock').value = p.stock;
+  
+  // Extract specs from svg text if it's default
+  let currentSpecs = '';
+  if (p.svgPath) {
+    const specLine = p.svgPath.match(/font-family[^>]*>([^<]+)</);
+    currentSpecs = specLine ? specLine[1] : '';
+  }
+  document.getElementById('edit-prod-specs').value = currentSpecs;
+
+  // Preview current photo
+  const previewDiv = document.getElementById('edit-prod-photo-preview');
+  const previewImg = document.getElementById('edit-preview-img');
+  
+  if (p.image) {
+    previewImg.src = p.image;
+    previewDiv.style.display = 'flex';
+  } else {
+    previewDiv.style.display = 'none';
+  }
+
+  // Clear file input
+  document.getElementById('edit-prod-photo').value = '';
+
+  // Show modal
+  const editModal = document.getElementById('edit-modal-overlay');
+  if (editModal) editModal.classList.add('open');
+}
+
+function closeEditModal() {
+  const editModal = document.getElementById('edit-modal-overlay');
+  if (editModal) editModal.classList.remove('open');
+}
+
+function handleSaveProductEdit(e) {
+  e.preventDefault();
+
+  const id = parseInt(document.getElementById('edit-prod-id').value);
+  const p = PRODUCTS.find(prod => prod.id === id);
+  if (!p) return;
+
+  const name = document.getElementById('edit-prod-name').value.trim();
+  const category = document.getElementById('edit-prod-cat').value;
+  const badge = document.getElementById('edit-prod-badge').value;
+  const price = parseInt(document.getElementById('edit-prod-price').value);
+  const oldPrice = parseInt(document.getElementById('edit-prod-oldprice').value);
+  const discountText = document.getElementById('edit-prod-discount').value.trim();
+  const stock = parseInt(document.getElementById('edit-prod-stock').value);
+  const specs = document.getElementById('edit-prod-specs').value.trim();
+
+  if (price > oldPrice) {
+    showToast('⚠️ Price cannot be greater than MRP (Old Price)!');
+    return;
+  }
+
   let discount = discountText;
   if (!discount) {
     const calc = Math.round(((oldPrice - price) / oldPrice) * 100);
     discount = calc > 0 ? `${calc}% OFF` : '';
   }
 
-  // Map category code to labels
   const catLabels = {
     cctv: 'CCTV Camera',
     keyboard: 'Keyboard',
@@ -1073,83 +1342,291 @@ function handleAddProduct(e) {
   };
   const catLabel = catLabels[category] || 'Tech Product';
 
-  // SVG preset generator based on category selection
-  let svgBg = '';
-  let svgPath = '';
-  if (category === 'cctv') {
-    svgBg = 'rgba(108,99,255,0.08)';
-    svgPath = `<ellipse cx="60" cy="55" rx="30" ry="30" fill="rgba(108,99,255,0.2)" stroke="#6C63FF" stroke-width="2"/>
-              <ellipse cx="60" cy="55" rx="16" ry="16" fill="#6C63FF" opacity="0.5"/>
-              <circle cx="60" cy="55" r="7" fill="#6C63FF"/>
-              <path d="M90 55h20l12-15v30l-12-15" fill="none" stroke="#6C63FF" stroke-width="3" stroke-linejoin="round"/>
-              <text x="60" y="110" text-anchor="middle" fill="#6C63FF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || '4K • Dome'}</text>`;
-  } else if (category === 'keyboard') {
-    svgBg = 'rgba(62,207,207,0.08)';
-    svgPath = `<rect x="10" y="38" width="100" height="50" rx="6" fill="rgba(62,207,207,0.12)" stroke="#3ECFCF" stroke-width="2"/>
-              <rect x="25" y="48" width="15" height="10" rx="2" fill="#3ECFCF" opacity="0.7"/>
-              <rect x="45" y="48" width="15" height="10" rx="2" fill="#6C63FF" opacity="0.7"/>
-              <rect x="65" y="48" width="15" height="10" rx="2" fill="#FF6B9D" opacity="0.7"/>
-              <rect x="85" y="48" width="15" height="10" rx="2" fill="#F7C948" opacity="0.7"/>
-              <rect x="35" y="65" width="50" height="10" rx="3" fill="#3ECFCF" opacity="0.5"/>
-              <text x="60" y="105" text-anchor="middle" fill="#3ECFCF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Mechanical'}</text>`;
-  } else if (category === 'mouse') {
-    svgBg = 'rgba(255,107,157,0.08)';
-    svgPath = `<path d="M35 35 Q60 28 85 35 L90 80 Q60 95 30 80 Z" fill="rgba(255,107,157,0.15)" stroke="#FF6B9D" stroke-width="2"/>
-              <line x1="60" y1="28" x2="60" y2="65" stroke="#FF6B9D" stroke-width="2" opacity="0.7"/>
-              <ellipse cx="60" cy="48" rx="10" ry="6" fill="rgba(255,107,157,0.4)"/>
-              <circle cx="60" cy="80" r="4" fill="#FF6B9D"/>
-              <text x="60" y="108" text-anchor="middle" fill="#FF6B9D" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Gaming Mouse'}</text>`;
-  } else if (category === 'computer') {
-    svgBg = 'rgba(247,201,72,0.08)';
-    svgPath = `<rect x="15" y="22" width="90" height="58" rx="5" fill="rgba(247,201,72,0.12)" stroke="#F7C948" stroke-width="2"/>
-              <rect x="22" y="28" width="76" height="46" rx="2" fill="#0a0a12"/>
-              <rect x="45" y="80" width="30" height="5" rx="2" fill="#F7C948" opacity="0.4"/>
-              <rect x="50" y="85" width="20" height="4" rx="2" fill="#F7C948" opacity="0.3"/>
-              <text x="60" y="108" text-anchor="middle" fill="#F7C948" font-size="9" font-weight="600" font-family="Inter,sans-serif">${specs || 'Intel Core PC'}</text>`;
-  } else if (category === 'speaker') {
-    svgBg = 'rgba(62,207,207,0.08)';
-    svgPath = `<rect x="25" y="20" width="70" height="75" rx="6" fill="rgba(62,207,207,0.12)" stroke="#3ECFCF" stroke-width="2"/>
-              <circle cx="60" cy="45" r="15" fill="none" stroke="#3ECFCF" stroke-width="2"/>
-              <circle cx="60" cy="45" r="6" fill="#3ECFCF" opacity="0.5"/>
-              <circle cx="60" cy="78" r="8" fill="none" stroke="#3ECFCF" stroke-width="1.5"/>
-              <text x="60" y="110" text-anchor="middle" fill="#3ECFCF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Desktop Audio'}</text>`;
-  } else {
-    svgBg = 'rgba(255,107,157,0.08)';
-    svgPath = `<circle cx="60" cy="50" r="20" stroke="#FF6B9D" stroke-width="2" fill="none"/>
-              <circle cx="60" cy="50" r="8" fill="#FF6B9D" opacity="0.4"/>
-              <path d="M60 18v12M60 70v12M28 50h12M80 50h12" stroke="#FF6B9D" stroke-width="2.5" stroke-linecap="round"/>
-              <text x="60" y="105" text-anchor="middle" fill="#FF6B9D" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'PC Hub Gear'}</text>`;
-  }
+  // Apply changes helper
+  const applyChanges = (base64Image = null) => {
+    p.name = name;
+    p.category = category;
+    p.catLabel = catLabel;
+    p.badge = badge;
+    p.price = price;
+    p.oldPrice = oldPrice;
+    p.discount = discount;
+    p.stock = stock;
 
-  // Create a new product entry
-  const newId = PRODUCTS.length > 0 ? Math.max(...PRODUCTS.map(p => p.id)) + 1 : 1;
-  const newProduct = {
-    id: newId,
-    category,
-    name,
-    catLabel,
-    price,
-    oldPrice,
-    discount,
-    rating: 5.0, // default rating for added items
-    reviews: 0,   // default review count
-    badge: badge || 'new',
-    svgBg,
-    svgPath,
-    stock
+    if (base64Image) {
+      p.image = base64Image;
+    }
+
+    // Refresh specs in fallback SVG if no image is present
+    if (!p.image) {
+      if (category === 'cctv') {
+        p.svgBg = 'rgba(108,99,255,0.08)';
+        p.svgPath = `<ellipse cx="60" cy="55" rx="30" ry="30" fill="rgba(108,99,255,0.2)" stroke="#6C63FF" stroke-width="2"/>
+                    <ellipse cx="60" cy="55" rx="16" ry="16" fill="#6C63FF" opacity="0.5"/>
+                    <circle cx="60" cy="55" r="7" fill="#6C63FF"/>
+                    <path d="M90 55h20l12-15v30l-12-15" fill="none" stroke="#6C63FF" stroke-width="3" stroke-linejoin="round"/>
+                    <text x="60" y="110" text-anchor="middle" fill="#6C63FF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || '4K • Dome'}</text>`;
+      } else if (category === 'keyboard') {
+        p.svgBg = 'rgba(62,207,207,0.08)';
+        p.svgPath = `<rect x="10" y="38" width="100" height="50" rx="6" fill="rgba(62,207,207,0.12)" stroke="#3ECFCF" stroke-width="2"/>
+                    <rect x="25" y="48" width="15" height="10" rx="2" fill="#3ECFCF" opacity="0.7"/>
+                    <rect x="45" y="48" width="15" height="10" rx="2" fill="#6C63FF" opacity="0.7"/>
+                    <rect x="65" y="48" width="15" height="10" rx="2" fill="#FF6B9D" opacity="0.7"/>
+                    <rect x="85" y="48" width="15" height="10" rx="2" fill="#F7C948" opacity="0.7"/>
+                    <rect x="35" y="65" width="50" height="10" rx="3" fill="#3ECFCF" opacity="0.5"/>
+                    <text x="60" y="105" text-anchor="middle" fill="#3ECFCF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Mechanical'}</text>`;
+      } else if (category === 'mouse') {
+        p.svgBg = 'rgba(255,107,157,0.08)';
+        p.svgPath = `<path d="M35 35 Q60 28 85 35 L90 80 Q60 95 30 80 Z" fill="rgba(255,107,157,0.15)" stroke="#FF6B9D" stroke-width="2"/>
+                    <line x1="60" y1="28" x2="60" y2="65" stroke="#FF6B9D" stroke-width="2" opacity="0.7"/>
+                    <ellipse cx="60" cy="48" rx="10" ry="6" fill="rgba(255,107,157,0.4)"/>
+                    <circle cx="60" cy="80" r="4" fill="#FF6B9D"/>
+                    <text x="60" y="108" text-anchor="middle" fill="#FF6B9D" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Gaming Mouse'}</text>`;
+      } else if (category === 'computer') {
+        p.svgBg = 'rgba(247,201,72,0.08)';
+        p.svgPath = `<rect x="15" y="22" width="90" height="58" rx="5" fill="rgba(247,201,72,0.12)" stroke="#F7C948" stroke-width="2"/>
+                    <rect x="22" y="28" width="76" height="46" rx="2" fill="#0a0a12"/>
+                    <rect x="45" y="80" width="30" height="5" rx="2" fill="#F7C948" opacity="0.4"/>
+                    <rect x="50" y="85" width="20" height="4" rx="2" fill="#F7C948" opacity="0.3"/>
+                    <text x="60" y="108" text-anchor="middle" fill="#F7C948" font-size="9" font-weight="600" font-family="Inter,sans-serif">${specs || 'Intel Core PC'}</text>`;
+      } else if (category === 'speaker') {
+        p.svgBg = 'rgba(62,207,207,0.08)';
+        p.svgPath = `<rect x="25" y="20" width="70" height="75" rx="6" fill="rgba(62,207,207,0.12)" stroke="#3ECFCF" stroke-width="2"/>
+                    <circle cx="60" cy="45" r="15" fill="none" stroke="#3ECFCF" stroke-width="2"/>
+                    <circle cx="60" cy="45" r="6" fill="#3ECFCF" opacity="0.5"/>
+                    <circle cx="60" cy="78" r="8" fill="none" stroke="#3ECFCF" stroke-width="1.5"/>
+                    <text x="60" y="110" text-anchor="middle" fill="#3ECFCF" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'Desktop Audio'}</text>`;
+      } else {
+        p.svgBg = 'rgba(255,107,157,0.08)';
+        p.svgPath = `<circle cx="60" cy="50" r="20" stroke="#FF6B9D" stroke-width="2" fill="none"/>
+                    <circle cx="60" cy="50" r="8" fill="#FF6B9D" opacity="0.4"/>
+                    <path d="M60 18v12M60 70v12M28 50h12M80 50h12" stroke="#FF6B9D" stroke-width="2.5" stroke-linecap="round"/>
+                    <text x="60" y="105" text-anchor="middle" fill="#FF6B9D" font-size="10" font-weight="600" font-family="Inter,sans-serif">${specs || 'PC Hub Gear'}</text>`;
+      }
+    }
+
+    saveProductsState();
+    
+    // Sync UI
+    const searchVal = document.getElementById('dash-search-input').value;
+    renderDashboardProducts(searchVal);
+    renderProducts(currentFilter);
+    validateCartStock();
+
+    closeEditModal();
+    showToast(`✏️ Changes to "${name}" saved!`);
   };
 
-  PRODUCTS.push(newProduct);
-  saveProductsState();
+  const photoInput = document.getElementById('edit-prod-photo');
+  if (photoInput.files && photoInput.files.length > 0) {
+    compressImage(photoInput.files[0], function(base64Image) {
+      applyChanges(base64Image);
+    });
+  } else {
+    applyChanges();
+  }
+}
 
-  // Reset Add form, success confirmation
-  document.getElementById('add-product-form').reset();
-  showToast(`✅ Added "${name}" successfully!`);
+// =============================================
+// DYNAMIC CATEGORIES LOGIC
+// =============================================
+function renderCategories() {
+  const container = document.getElementById('categories-grid');
+  if (!container) return;
 
-  // Reload views
-  const searchVal = document.getElementById('dash-search-input').value;
-  renderDashboardProducts(searchVal);
-  renderProducts(currentFilter);
+  container.innerHTML = CATEGORIES.map(cat => {
+    // Count products in this category dynamically
+    const count = PRODUCTS.filter(p => p.category === cat.id).length;
+    return `
+      <div class="category-card cat-${cat.id}" id="cat-${cat.id}" onclick="filterProducts('${cat.id}')">
+        <div class="cat-icon">
+          <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            ${cat.svgPath}
+          </svg>
+        </div>
+        <h3 class="cat-name">${cat.name}</h3>
+        <p class="cat-desc">${cat.desc}</p>
+        <span class="cat-count">${count} Product${count !== 1 ? 's' : ''}</span>
+        <div class="cat-arrow">→</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderFilterBar() {
+  const filterBar = document.getElementById('filter-bar');
+  if (!filterBar) return;
+
+  const buttonsHTML = `
+    <button class="filter-btn active" id="filter-all" onclick="filterProducts('all')">All</button>
+  ` + CATEGORIES.map(cat => `
+    <button class="filter-btn" id="filter-${cat.id}" onclick="filterProducts('${cat.id}')">${cat.name}</button>
+  `).join('');
+
+  filterBar.innerHTML = buttonsHTML;
+}
+
+function populateCategoryDropdowns() {
+  const addSelect = document.getElementById('prod-cat');
+  const editSelect = document.getElementById('edit-prod-cat');
+  
+  const optionsHTML = CATEGORIES.map(cat => `
+    <option value="${cat.id}">${cat.name}</option>
+  `).join('');
+
+  if (addSelect) addSelect.innerHTML = optionsHTML;
+  if (editSelect) editSelect.innerHTML = optionsHTML;
+}
+
+// Toggle Dashboard panel views (Products vs Categories)
+function toggleDashboardView() {
+  const productsPanel = document.getElementById('dash-products-panel');
+  const categoriesPanel = document.getElementById('dash-categories-panel');
+  const toggleBtn = document.getElementById('toggle-dash-view-btn');
+
+  if (productsPanel && categoriesPanel && toggleBtn) {
+    if (productsPanel.style.display !== 'none') {
+      // Switch to Categories View
+      productsPanel.style.display = 'none';
+      categoriesPanel.style.display = 'grid';
+      toggleBtn.innerHTML = '📦 Manage Products';
+      renderDashboardCategories();
+    } else {
+      // Switch to Products View
+      productsPanel.style.display = 'grid';
+      categoriesPanel.style.display = 'none';
+      toggleBtn.innerHTML = '📁 Manage Categories';
+      renderDashboardProducts();
+    }
+  }
+}
+
+// Render categories in Owner panel list
+function renderDashboardCategories() {
+  const listContainer = document.getElementById('dashboard-category-list');
+  if (!listContainer) return;
+
+  if (CATEGORIES.length === 0) {
+    listContainer.innerHTML = '<div style="padding:24px; text-align:center; color:var(--text-muted); font-size:0.875rem;">No categories found</div>';
+    return;
+  }
+
+  listContainer.innerHTML = CATEGORIES.map(cat => {
+    const prodCount = PRODUCTS.filter(p => p.category === cat.id).length;
+    return `
+      <div class="dashboard-item">
+        <div class="dash-item-icon" style="background:${cat.svgBg || 'rgba(108,99,255,0.08)'}">
+          <svg viewBox="0 0 64 64" fill="none" style="width:28px; height:28px;">
+            ${cat.svgPath}
+          </svg>
+        </div>
+        <div class="dash-item-details">
+          <div class="dash-item-name">${cat.name} (Key: ${cat.id})</div>
+          <div class="dash-item-meta">${cat.desc} &nbsp;•&nbsp; ${prodCount} Product${prodCount !== 1 ? 's' : ''}</div>
+        </div>
+        <div class="dash-item-controls">
+          <button class="dash-btn-delete" onclick="deleteDashboardCategory('${cat.id}')" title="Delete Category">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Add Dynamic Category
+function handleAddCategory(e) {
+  e.preventDefault();
+
+  const id = document.getElementById('cat-id-input').value.trim().toLowerCase();
+  const name = document.getElementById('cat-name-input').value.trim();
+  const desc = document.getElementById('cat-desc-input').value.trim();
+
+  // Validate ID format & duplicate checks
+  if (!/^[a-z0-9]+$/.test(id)) {
+    showToast('⚠️ Category ID key must be lowercase letters and numbers only!');
+    return;
+  }
+  if (CATEGORIES.some(c => c.id === id)) {
+    showToast('⚠️ Category ID key already exists!');
+    return;
+  }
+
+  // Create a default category circle vector icon
+  const svgBg = 'rgba(108,99,255,0.08)';
+  const svgPath = `<circle cx="32" cy="32" r="30" fill="url(#cctvGrad)" opacity="0.15"/><circle cx="32" cy="32" r="10" stroke="#6C63FF" stroke-width="2"/><circle cx="32" cy="32" r="4" fill="#3ECFCF"/><defs><linearGradient id="cctvGrad" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#6C63FF"/><stop offset="1" stop-color="#3ECFCF"/></linearGradient></defs>`;
+
+  const newCategory = {
+    id,
+    name,
+    desc,
+    svgBg,
+    svgPath
+  };
+
+  CATEGORIES.push(newCategory);
+  saveCategoriesState();
+
+  // Sync controls and update forms
+  populateCategoryDropdowns();
+  renderCategories();
+  renderFilterBar();
+  renderDashboardCategories();
+
+  document.getElementById('add-category-form').reset();
+  showToast(`✅ Category "${name}" added successfully!`);
+}
+
+// Delete Category and safe re-categorize items
+function deleteDashboardCategory(categoryId) {
+  if (CATEGORIES.length <= 1) {
+    showToast('⚠️ At least one category must exist in the catalog!');
+    return;
+  }
+
+  const cat = CATEGORIES.find(c => c.id === categoryId);
+  if (!cat) return;
+
+  const prodCount = PRODUCTS.filter(p => p.category === categoryId).length;
+  const warningMsg = prodCount > 0 
+    ? `Warning: There are ${prodCount} products in this category. Deleting this category will move all of them to the "Uncategorized" category.\n\nAre you sure you want to delete "${cat.name}"?`
+    : `Are you sure you want to delete the category "${cat.name}"?`;
+
+  if (confirm(warningMsg)) {
+    CATEGORIES = CATEGORIES.filter(c => c.id !== categoryId);
+    
+    // Ensure "uncategorized" exists if we have products to move
+    if (prodCount > 0 && !CATEGORIES.some(c => c.id === 'uncategorized')) {
+      CATEGORIES.push({
+        id: 'uncategorized',
+        name: 'Uncategorized',
+        desc: 'Other products without specified category',
+        svgBg: 'rgba(255,107,157,0.08)',
+        svgPath: `<circle cx="32" cy="32" r="30" fill="rgba(255,107,157,0.15)" stroke="#FF6B9D" stroke-width="2"/><circle cx="32" cy="32" r="10" stroke="#FF6B9D" stroke-width="2" opacity="0.6"/>`
+      });
+    }
+
+    // Remap products category
+    PRODUCTS.forEach(p => {
+      if (p.category === categoryId) {
+        p.category = 'uncategorized';
+        p.catLabel = 'Uncategorized';
+      }
+    });
+
+    saveCategoriesState();
+    saveProductsState();
+
+    // Re-sync UI components
+    populateCategoryDropdowns();
+    renderCategories();
+    renderFilterBar();
+    renderDashboardCategories();
+    renderDashboardProducts(); // update count labels if visible
+    renderProducts('all'); // refresh main listings
+
+    showToast(`🗑️ Category "${cat.name}" deleted.`);
+  }
 }
 
 // =============================================
@@ -1179,6 +1656,9 @@ function handleFormSubmit(e) {
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
   checkOwnerSession();
+  populateCategoryDropdowns();
+  renderCategories();
+  renderFilterBar();
   renderProducts('all');
   initNavbar();
   initSearch();

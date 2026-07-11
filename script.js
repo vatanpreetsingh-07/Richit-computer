@@ -237,7 +237,19 @@ if (!CATEGORIES || CATEGORIES.length === 0) {
 }
 
 function saveCategoriesState() {
+  // 1) Always write to localStorage for instant local cache
   localStorage.setItem('richit_categories', JSON.stringify(CATEGORIES));
+
+  // 2) Upsert to Supabase if configured (cloud persistence)
+  if (window.supabaseDb) {
+    window.supabaseDb
+      .from('store_config')
+      .upsert({ key: 'categories', data: CATEGORIES, updated_at: new Date().toISOString() })
+      .then(({ error }) => {
+        if (error) console.warn('⚠️ Supabase categories save failed:', error.message);
+        else console.log('✅ Categories saved to Supabase.');
+      });
+  }
 }
 
 // Load products from localStorage or initialize with defaults
@@ -245,10 +257,118 @@ let PRODUCTS = JSON.parse(localStorage.getItem('richit_products'));
 if (!PRODUCTS || PRODUCTS.length === 0) {
   PRODUCTS = DEFAULT_PRODUCTS.map(p => ({ ...p, stock: 15 }));
   localStorage.setItem('richit_products', JSON.stringify(PRODUCTS));
+} else {
+  // Sanitize to make sure every product has a valid stock value (not undefined)
+  PRODUCTS = PRODUCTS.map(p => ({ ...p, stock: typeof p.stock === 'number' ? p.stock : 15 }));
 }
 
 function saveProductsState() {
+  // 1) Always write to localStorage for instant local cache
   localStorage.setItem('richit_products', JSON.stringify(PRODUCTS));
+
+  // 2) Upsert to Supabase if configured (cloud persistence)
+  if (window.supabaseDb) {
+    window.supabaseDb
+      .from('store_config')
+      .upsert({ key: 'products', data: PRODUCTS, updated_at: new Date().toISOString() })
+      .then(({ error }) => {
+        if (error) console.warn('⚠️ Supabase products save failed:', error.message);
+        else console.log('✅ Products saved to Supabase.');
+      });
+  }
+}
+
+// =============================================
+// SUPABASE REAL-TIME SYNC
+// =============================================
+function applyCloudRow(row) {
+  if (!row || !Array.isArray(row.data) || row.data.length === 0) return;
+
+  if (row.key === 'products') {
+    // Sanitize to make sure every product has a valid stock value
+    PRODUCTS = row.data.map(p => ({ ...p, stock: typeof p.stock === 'number' ? p.stock : 15 }));
+    localStorage.setItem('richit_products', JSON.stringify(PRODUCTS));
+    renderProducts(currentFilter);
+    validateCartStock();
+    // Refresh owner dashboard product list if open
+    const dash = document.getElementById('dashboard-modal-overlay');
+    if (dash && dash.classList.contains('open')) {
+      const searchVal = document.getElementById('dash-search-input');
+      renderDashboardProducts(searchVal ? searchVal.value : '');
+    }
+    console.log(`🔄 Products synced from Supabase (${PRODUCTS.length} items).`);
+  }
+
+  if (row.key === 'categories') {
+    CATEGORIES = row.data;
+    localStorage.setItem('richit_categories', JSON.stringify(CATEGORIES));
+    renderCategories();
+    renderFilterBar();
+    populateCategoryDropdowns();
+    // Refresh owner dashboard category panel if open
+    const catPanel = document.getElementById('dash-categories-panel');
+    if (catPanel && catPanel.style.display !== 'none') {
+      renderDashboardCategories();
+    }
+    console.log(`🔄 Categories synced from Supabase (${CATEGORIES.length} items).`);
+  }
+}
+
+function initSupabase() {
+  if (!window.supabaseDb) {
+    // Supabase not configured — localStorage-only mode, nothing more to do
+    return;
+  }
+
+  const sb = window.supabaseDb;
+
+  // ── Step 1: Load latest data from Supabase on page open ────
+  sb.from('store_config')
+    .select('key, data')
+    .then(({ data: rows, error }) => {
+      if (error) {
+        console.warn('⚠️ Supabase initial load error:', error.message);
+        return;
+      }
+
+      if (rows && rows.length > 0) {
+        // Cloud has data — apply each row
+        rows.forEach(row => applyCloudRow(row));
+      } else {
+        // First run: Supabase table is empty — seed with current localStorage data
+        console.log('🌱 Seeding Supabase with default data...');
+        sb.from('store_config')
+          .upsert([
+            { key: 'products',   data: PRODUCTS,   updated_at: new Date().toISOString() },
+            { key: 'categories', data: CATEGORIES, updated_at: new Date().toISOString() }
+          ])
+          .then(({ error: seedErr }) => {
+            if (seedErr) console.warn('⚠️ Supabase seed error:', seedErr.message);
+            else console.log('✅ Supabase seeded with default products & categories.');
+          });
+      }
+    });
+
+  // ── Step 2: Subscribe to real-time changes ─────────────────
+  // Whenever ANY browser saves a change, all other open browsers
+  // receive the update automatically via WebSocket.
+  sb.channel('store-realtime')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'store_config' },
+      payload => {
+        if (payload.new) {
+          applyCloudRow(payload.new);
+        }
+      }
+    )
+    .subscribe(status => {
+      if (status === 'SUBSCRIBED') {
+        console.log('📡 Supabase realtime channel active — changes will sync instantly.');
+      }
+    });
+
+  showToast('🟢 Connected to Supabase — data syncs across all devices!', 3500);
 }
 
 
@@ -331,9 +451,9 @@ function createProductCard(p) {
           <span>${p.stock > 0 ? `● In Stock (${p.stock} units)` : `● Out of Stock`}</span>
         </div>
         <!-- BUY NOW BUTTON (full width, prominent) -->
-        <button class="btn-buy-now" id="buy-now-${p.id}" onclick="buyNow(${p.id})" ${p.stock <= 0 ? 'disabled style="background:linear-gradient(135deg, #555 0%, #333 100%); cursor:not-allowed; opacity:0.6;"' : ''}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-          ${p.stock > 0 ? 'Buy Now via WhatsApp' : 'Out of Stock'}
+        <button class="btn-buy-now" id="buy-now-${p.id}" onclick="openPaymentModal(${p.id})" ${p.stock <= 0 ? 'disabled style="background:linear-gradient(135deg, #555 0%, #333 100%); cursor:not-allowed; opacity:0.6;"' : ''}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          ${p.stock > 0 ? '⚡ Buy Now (UPI)' : 'Out of Stock'}
         </button>
         <div class="product-actions">
           <button class="btn-add-cart" id="add-cart-${p.id}" onclick="addToCart(${p.id})" ${p.stock <= 0 ? 'disabled style="background:#555; cursor:not-allowed; opacity:0.6;"' : ''}>
@@ -350,54 +470,244 @@ function createProductCard(p) {
 }
 
 // =============================================
-// BUY NOW – WhatsApp Integration
+// BUY NOW – UPI Flow
 // =============================================
 const OWNER_WHATSAPP = '917015510961'; // Country code + number
+const OWNER_UPI = '9253455405-6@ybl';
 
-function buyNow(productId) {
+let selectedPaymentFile = null;
+let currentPaymentProductId = null;
+
+// Opens the UPI payment modal for the selected product
+function openPaymentModal(productId) {
   const p = PRODUCTS.find(prod => prod.id === productId);
   if (!p) return;
 
-  const savings = p.oldPrice - p.price;
-  const stars = '⭐'.repeat(Math.floor(p.rating));
-  const specLine = p.svgPath.match(/font-family[^>]*>([^<]+)</);
-  const specs = specLine ? specLine[1] : '';
+  currentPaymentProductId = productId;
+  selectedPaymentFile = null;
 
-  // Build a detailed, friendly WhatsApp message
-  const message =
-`🛒 *ORDER INQUIRY – Richit Computer*
-━━━━━━━━━━━━━━━━━━━━
-📦 *Product:* ${p.name}
-🏷️ *Category:* ${p.catLabel}
-${specs ? `⚙️ *Specs:* ${specs}\n` : ''}
-💰 *Price:* ₹${p.price.toLocaleString('en-IN')}
-🔖 *MRP:* ₹${p.oldPrice.toLocaleString('en-IN')}
-✅ *You Save:* ₹${savings.toLocaleString('en-IN')} (${p.discount})
-${stars} *Rating:* ${p.rating}/5 (${p.reviews} reviews)
-━━━━━━━━━━━━━━━━━━━━
-📍 *Shop:* Richit Computer
-   Shop No. 02, Stadium Market, Safidon
-📞 *Call:* 89300 16011 / 70155 10961
-━━━━━━━━━━━━━━━━━━━━
-Hello Richit bhai! 👋
-I am interested in buying the *${p.name}* for ₹${p.price.toLocaleString('en-IN')}.
-Please confirm availability and delivery details. 🙏`;
-
-  const encodedMsg = encodeURIComponent(message);
-  const waUrl = `https://wa.me/${OWNER_WHATSAPP}?text=${encodedMsg}`;
-
-  // Animate the button briefly before opening
-  const btn = document.getElementById(`buy-now-${productId}`);
-  if (btn) {
-    btn.classList.add('btn-buy-now--sending');
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="animation:spin 0.6s linear infinite"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 18a8 8 0 110-16 8 8 0 010 16zm-1-5h2v2h-2zm0-8h2v6h-2z"/></svg> Opening WhatsApp...`;
-    setTimeout(() => {
-      btn.classList.remove('btn-buy-now--sending');
-      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> Buy Now via WhatsApp`;
-    }, 1500);
+  let modal = document.getElementById('payment-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'payment-modal';
+    modal.className = 'product-modal-overlay';
+    modal.onclick = (e) => { if (e.target === modal) closePaymentModal(); };
+    document.body.appendChild(modal);
   }
 
-  // Open WhatsApp in new tab
+  // Construct UPI URIs
+  const upiParams = `pa=${OWNER_UPI}&pn=${encodeURIComponent('Richit Computer')}&am=${p.price}&cu=INR&tn=${encodeURIComponent('Order: ' + p.name)}`;
+  const upiUriGeneric = `upi://pay?${upiParams}`;
+  const upiUriPhonePe  = `phonepe://pay?${upiParams}`;
+  const upiUriPaytm    = `paytmmp://pay?${upiParams}`;
+  const upiUriGPay     = `gpay://upi/pay?${upiParams}`;
+
+  // QR Code generator API URL
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUriGeneric)}`;
+
+  modal.innerHTML = `
+    <div class="product-modal-box" style="max-width: 500px; padding: 24px;">
+      <button class="product-modal-close" onclick="closePaymentModal()">✕</button>
+      
+      <div class="upi-modal-content">
+        <div style="text-align: center; margin-bottom: 8px;">
+          <h2 style="font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:800;color:var(--purple);margin-bottom:6px;">⚡ Pay via UPI</h2>
+          <p style="font-size:0.85rem;color:var(--text-secondary);">Complete payment of <strong>₹${p.price.toLocaleString('en-IN')}</strong> for "${p.name}"</p>
+        </div>
+
+        <!-- QR Code for desktop/mobile scanning -->
+        <div class="qr-container">
+          <img class="qr-image" src="${qrUrl}" alt="Scan QR Code to Pay" />
+          <span style="font-size:0.75rem;color:var(--text-secondary);text-align:center;line-height:1.4;">
+            Scan QR code with Google Pay, PhonePe, Paytm, or BHIM app
+          </span>
+        </div>
+
+        <!-- UPI App chooser (for mobile users) -->
+        <div style="text-align: center;">
+          <span style="font-size:0.75rem;color:var(--text-secondary);font-weight:600;">OR Pay Directly via Mobile App</span>
+          <div class="upi-app-list">
+            <button class="upi-app-btn" onclick="window.open('${upiUriPhonePe}', '_blank')">
+              <img src="https://img.icons8.com/color/48/phonepe.png" alt="PhonePe"/> PhonePe
+            </button>
+            <button class="upi-app-btn" onclick="window.open('${upiUriGPay}', '_blank')">
+              <img src="https://img.icons8.com/color/48/google-pay.png" alt="GPay"/> Google Pay
+            </button>
+            <button class="upi-app-btn" onclick="window.open('${upiUriPaytm}', '_blank')">
+              <img src="https://img.icons8.com/color/48/paytm.png" alt="Paytm"/> Paytm
+            </button>
+            <button class="upi-app-btn" onclick="window.open('${upiUriGeneric}', '_blank')">
+              📦 Any UPI App
+            </button>
+          </div>
+        </div>
+
+        <hr style="border:0;border-top:1px solid var(--border);margin:4px 0;"/>
+
+        <!-- Upload screenshot section -->
+        <div>
+          <span style="font-size:0.8rem;color:var(--text-primary);font-weight:700;display:block;margin-bottom:8px;">📸 Upload Payment Screenshot</span>
+          <div class="screenshot-upload-box" onclick="document.getElementById('upi-screenshot-input').click()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--purple);margin-bottom:6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p style="font-size:0.75rem;color:var(--text-secondary);" id="upi-upload-label">Click to select receipt screenshot</p>
+            <input type="file" id="upi-screenshot-input" accept="image/*" style="display:none;" onchange="handleUpiScreenshotSelect(event)"/>
+          </div>
+          
+          <div class="screenshot-preview-container" id="upi-preview-container">
+            <img id="upi-screenshot-preview" src="" alt="Payment Screenshot Preview"/>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <button class="btn btn-primary" id="btn-submit-payment" style="width:100%;margin-top:8px;opacity:0.6;cursor:not-allowed;" disabled onclick="handlePaymentSubmit()">
+          <span>Submit &amp; Chat on WhatsApp</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePaymentModal() {
+  const modal = document.getElementById('payment-modal');
+  if (modal) modal.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// File input callback to handle preview and enable submit button
+function handleUpiScreenshotSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  selectedPaymentFile = file;
+  
+  const preview = document.getElementById('upi-screenshot-preview');
+  const container = document.getElementById('upi-preview-container');
+  const label = document.getElementById('upi-upload-label');
+  const btn = document.getElementById('btn-submit-payment');
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    preview.src = e.target.result;
+    container.style.display = 'flex';
+    label.textContent = `Selected: ${file.name} (${Math.round(file.size / 1024)} KB)`;
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+  };
+  reader.readAsDataURL(file);
+}
+
+// Helper to compress the screenshot before saving it to Supabase
+function compressScreenshot(file, callback) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 500;
+      const MAX_HEIGHT = 500;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          width = MAX_HEIGHT;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      const base64Data = canvas.toDataURL('image/jpeg', 0.65);
+      callback(base64Data);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+// Compresses screenshot, writes to Supabase, constructs receipt link, redirects to WhatsApp
+function handlePaymentSubmit() {
+  if (!selectedPaymentFile || !currentPaymentProductId) return;
+
+  const btn = document.getElementById('btn-submit-payment');
+  btn.disabled = true;
+  btn.innerHTML = `<span>Uploading Receipt...</span>`;
+
+  const p = PRODUCTS.find(prod => prod.id === currentPaymentProductId);
+  if (!p) return;
+
+  compressScreenshot(selectedPaymentFile, function(base64Screenshot) {
+    if (!window.supabaseDb) {
+      // Fallback if Supabase not configured yet
+      showToast('⚠️ Supabase config missing. Opening WhatsApp...');
+      sendPaymentWhatsApp(p, null, base64Screenshot);
+      closePaymentModal();
+      return;
+    }
+
+    // Insert transaction into public 'payments' table
+    window.supabaseDb
+      .from('payments')
+      .insert([
+        {
+          product_id: p.id,
+          product_name: p.name,
+          price: p.price,
+          screenshot: base64Screenshot
+        }
+      ])
+      .select()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Supabase write error:', error.message);
+          showToast('⚠️ Database sync failed. Opening WhatsApp directly.');
+          sendPaymentWhatsApp(p, null, base64Screenshot);
+        } else if (data && data[0]) {
+          showToast('🎉 Receipt uploaded to cloud!');
+          sendPaymentWhatsApp(p, data[0].id, base64Screenshot);
+        }
+        closePaymentModal();
+      });
+  });
+}
+
+// Opens WhatsApp containing order info, price, specs, and verification URL
+function sendPaymentWhatsApp(product, paymentId, base64Screenshot) {
+  const specsLine = product.svgPath.match(/font-family[^>]*>([^<]+)</);
+  const specs = specsLine ? specsLine[1] : '';
+
+  // Get viewer link
+  const receiptLink = paymentId 
+    ? `${window.location.origin}${window.location.pathname}?view_payment=${paymentId}`
+    : 'No link available (Database offline)';
+
+  const message =
+`🛒 *NEW UPI ORDER – Richit Computer*
+━━━━━━━━━━━━━━━━━━━━
+📦 *Product:* ${product.name}
+🏷️ *Category:* ${product.catLabel}
+${specs ? `⚙️ *Specs:* ${specs}\n` : ''}
+💰 *Price Paid:* ₹${product.price.toLocaleString('en-IN')}
+🧾 *Status:* UPI Paid via App
+━━━━━━━━━━━━━━━━━━━━
+🔗 *Verify Receipt & Screenshot:*
+${receiptLink}
+━━━━━━━━━━━━━━━━━━━━
+Hello Richit bhai! 👋
+I have just paid ₹${product.price.toLocaleString('en-IN')} via UPI for the *${product.name}* and uploaded my payment screenshot. Please confirm my order! 🙏`;
+
+  const waUrl = `https://wa.me/${OWNER_WHATSAPP}?text=${encodeURIComponent(message)}`;
   window.open(waUrl, '_blank');
   showToast('🟢 Opening WhatsApp with order details!', 3000);
 }
@@ -454,9 +764,9 @@ function openProductDetail(productId) {
             🔧 Free installation for CCTV systems<br/>
             💬 Chat with owner for best deal
           </div>
-          <button class="btn-buy-now" style="width:100%;margin-bottom:10px;" onclick="closeProductModal();buyNow(${p.id})" ${p.stock <= 0 ? 'disabled style="background:linear-gradient(135deg, #555 0%, #333 100%); cursor:not-allowed; opacity:0.6;"' : ''}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-            ${p.stock > 0 ? 'Buy Now via WhatsApp' : 'Out of Stock'}
+          <button class="btn-buy-now" style="width:100%;margin-bottom:10px;" onclick="closeProductModal();openPaymentModal(${p.id})" ${p.stock <= 0 ? 'disabled style="background:linear-gradient(135deg, #555 0%, #333 100%); cursor:not-allowed; opacity:0.6;"' : ''}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            ${p.stock > 0 ? 'Buy Now (UPI)' : 'Out of Stock'}
           </button>
           <button class="btn-add-cart" style="width:100%;" onclick="closeProductModal();addToCart(${p.id})" ${p.stock <= 0 ? 'disabled style="background:#555; cursor:not-allowed; opacity:0.6;"' : ''}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -1668,4 +1978,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Cart button from hero section
   const cartBtn = document.getElementById('cart-btn');
   if (cartBtn) cartBtn.addEventListener('click', toggleCart);
+
+  // ── Supabase real-time sync ────────────────────────────────
+  // initSupabase() is safe to call even when Supabase isn't configured —
+  // it checks window.supabaseDb and silently does nothing if not set up.
+  initSupabase();
+
+  // ── Check if user landed on payment receipt viewer link ──
+  checkPaymentReceipt();
 });

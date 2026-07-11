@@ -477,6 +477,7 @@ const OWNER_UPI = '9253455405-6@ybl';
 
 let selectedPaymentFile = null;
 let currentPaymentProductId = null;
+let currentViewedReceiptData = null;
 
 // Opens the UPI payment modal for the selected product
 function openPaymentModal(productId) {
@@ -755,6 +756,7 @@ I have just paid ₹${product.price.toLocaleString('en-IN')} via UPI for the *${
 
 // Verification Modal for owner to view screenshot
 function showPaymentReceiptModal(data) {
+  currentViewedReceiptData = data;
   let modal = document.getElementById('receipt-modal');
   if (!modal) {
     modal = document.createElement('div');
@@ -793,7 +795,15 @@ function showPaymentReceiptModal(data) {
         <img src="${data.screenshot}" style="max-width:100%;max-height:300px;object-fit:contain;" alt="Payment Screenshot"/>
       </div>
 
-      <button class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="closeReceiptModal()">Close Receipt</button>
+      <div style="display:grid;grid-template-columns:1.2fr 0.8fr;gap:12px;margin-top:16px;">
+        <button class="btn btn-primary" onclick="downloadReceiptImage()" style="background:var(--gradient-main); display:flex; align-items:center; justify-content:center; gap:6px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Receipt
+        </button>
+        <button class="btn btn-secondary" onclick="closeReceiptModal()" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text-primary);">
+          Close
+        </button>
+      </div>
     </div>
   `;
 
@@ -805,11 +815,134 @@ function closeReceiptModal() {
   const modal = document.getElementById('receipt-modal');
   if (modal) modal.classList.remove('open');
   document.body.style.overflow = '';
+  currentViewedReceiptData = null;
   
   // Clean parameter from URL to avoid re-opening on reload
   const url = new URL(window.location);
   url.searchParams.delete('view_payment');
   window.history.replaceState({}, document.title, url.pathname);
+}
+
+// Draws receipt details + screenshot image to canvas and downloads as PNG
+function downloadReceiptImage() {
+  const data = currentViewedReceiptData;
+  if (!data) return;
+
+  showToast('⌛ Preparing receipt download...');
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  // Set dimensions (600px width, 850px height)
+  const width = 600;
+  const height = 850;
+  canvas.width = width;
+  canvas.height = height;
+  
+  // 1. Solid Dark Background
+  ctx.fillStyle = '#0a0a0f';
+  ctx.fillRect(0, 0, width, height);
+  
+  // Outer Cyber/Purple Border
+  ctx.strokeStyle = '#6C63FF';
+  ctx.lineWidth = 4;
+  ctx.strokeRect(2, 2, width - 4, height - 4);
+  
+  // 2. Header Title
+  ctx.font = 'bold 24px sans-serif';
+  ctx.fillStyle = '#f0f0ff';
+  ctx.textAlign = 'center';
+  ctx.fillText('RICHIT COMPUTER', width / 2, 50);
+  
+  ctx.font = '14px sans-serif';
+  ctx.fillStyle = '#a0a0c0';
+  ctx.fillText('Stadium Market, Safidon, Haryana', width / 2, 75);
+  ctx.fillText('Call: 89300 16011 / 70155 10961', width / 2, 95);
+  
+  // Separator Line
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(30, 115);
+  ctx.lineTo(width - 30, 115);
+  ctx.stroke();
+  
+  // 3. Receipt Subheader
+  ctx.font = 'bold 18px sans-serif';
+  ctx.fillStyle = '#3ECFCF';
+  ctx.fillText('PAYMENT TRANSACTION RECEIPT', width / 2, 145);
+  
+  // 4. Details Container
+  ctx.fillStyle = 'rgba(255,255,255,0.02)';
+  ctx.fillRect(40, 170, width - 80, 155);
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+  ctx.strokeRect(40, 170, width - 80, 155);
+  
+  ctx.textAlign = 'left';
+  ctx.font = '15px sans-serif';
+  
+  // Labels
+  ctx.fillStyle = '#a0a0c0';
+  ctx.fillText('Receipt ID:', 60, 205);
+  ctx.fillText('Product Name:', 60, 240);
+  ctx.fillText('Amount Paid:', 60, 275);
+  ctx.fillText('Payment Date:', 60, 310);
+  
+  // Values
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#f0f0ff';
+  ctx.fillText(`#${data.id}`, width - 60, 205);
+  ctx.fillText(data.product_name.substring(0, 32) + (data.product_name.length > 32 ? '...' : ''), width - 60, 240);
+  ctx.fillStyle = '#3ECFCF';
+  ctx.font = 'bold 15px sans-serif';
+  ctx.fillText(`₹${Number(data.price).toLocaleString('en-IN')}`, width - 60, 275);
+  ctx.font = '15px sans-serif';
+  ctx.fillStyle = '#f0f0ff';
+  ctx.fillText(new Date(data.created_at).toLocaleString('en-IN'), width - 60, 310);
+  
+  // 5. Draw Screenshot Image
+  const img = new Image();
+  img.onload = function() {
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 14px sans-serif';
+    ctx.fillStyle = '#a0a0c0';
+    ctx.fillText('UPLOADED PAYMENT SCREENSHOT', width / 2, 365);
+    
+    // Screenshot dimensions
+    const sWidth = 320;
+    const sHeight = 410;
+    const sX = (width - sWidth) / 2;
+    const sY = 385;
+    
+    // Draw background border box for screenshot
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(sX - 4, sY - 4, sWidth + 8, sHeight + 8);
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.strokeRect(sX - 4, sY - 4, sWidth + 8, sHeight + 8);
+    
+    ctx.drawImage(img, sX, sY, sWidth, sHeight);
+    
+    // Footer message
+    ctx.font = 'italic 12px sans-serif';
+    ctx.fillStyle = '#606080';
+    ctx.fillText('Thank you for purchasing with Richit Computer!', width / 2, height - 20);
+    
+    // Auto download
+    try {
+      const link = document.createElement('a');
+      link.download = `receipt_richit_computer_${data.id}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showToast('💾 Receipt image downloaded successfully!');
+    } catch (e) {
+      console.warn('Canvas download error:', e.message);
+      showToast('⚠️ Could not auto-download image. Try saving the screen.');
+    }
+  };
+  img.onerror = () => {
+    showToast('⚠️ Error loading receipt screenshot image.');
+  };
+  img.src = data.screenshot;
 }
 
 // Checks URL on startup for receipt ID parameters

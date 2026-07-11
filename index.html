@@ -610,8 +610,12 @@
     <div class="modal-box dashboard-box">
       <div class="dashboard-header">
         <h3>⚙️ Owner Dashboard</h3>
-        <div class="dashboard-header-actions">
-          <button class="btn btn-ghost btn-sm" id="toggle-dash-view-btn" onclick="toggleDashboardView()">📁 Manage Categories</button>
+        <div style="display:flex; gap:8px; margin-left:24px;" class="dash-tabs">
+          <button class="btn btn-ghost btn-sm active" id="tab-products" onclick="switchDashboardTab('products')">📦 Products</button>
+          <button class="btn btn-ghost btn-sm" id="tab-categories" onclick="switchDashboardTab('categories')">📁 Categories</button>
+          <button class="btn btn-ghost btn-sm" id="tab-payments" onclick="switchDashboardTab('payments')">🧾 Payments</button>
+        </div>
+        <div class="dashboard-header-actions" style="margin-left:auto;">
           <button class="btn btn-ghost btn-sm" onclick="handleOwnerLogout()" id="logout-btn">Logout</button>
           <button class="modal-close-btn" onclick="closeDashboardModal()" id="close-dash-btn">✕</button>
         </div>
@@ -719,6 +723,21 @@
           <h4>📦 Manage Existing Categories</h4>
           <div class="dashboard-product-list" id="dashboard-category-list">
             <!-- Category list items injected dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Payments Panel -->
+      <div class="dashboard-body" id="dash-payments-panel" style="display:none; grid-template-columns: 1fr; gap: 24px;">
+        <div class="dashboard-column" style="width:100%;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h4 style="border-left: 3px solid var(--cyan); padding-left: 10px;">🧾 Customer Payments &amp; Screenshots</h4>
+            <button class="btn btn-ghost btn-sm" onclick="fetchDashboardPayments()" style="border:1px solid var(--border); border-radius:100px; padding:6px 14px; font-size:0.8rem; display:flex; align-items:center; gap:6px;">
+              🔄 Refresh List
+            </button>
+          </div>
+          <div class="dashboard-product-list" id="dashboard-payments-list" style="max-height: 520px; overflow-y: auto;">
+            <!-- Payment records injected dynamically -->
           </div>
         </div>
       </div>

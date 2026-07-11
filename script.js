@@ -1530,7 +1530,7 @@ function openDashboardModal() {
   const modal = document.getElementById('dashboard-modal-overlay');
   if (modal) modal.classList.add('open');
   document.body.style.overflow = 'hidden';
-  renderDashboardProducts();
+  switchDashboardTab('products');
 }
 
 function closeDashboardModal() {
@@ -1543,13 +1543,8 @@ function closeDashboardModal() {
     document.getElementById('add-product-form').reset();
     document.getElementById('add-category-form').reset();
     
-    // Reset view toggle state back to products
-    const productsPanel = document.getElementById('dash-products-panel');
-    const categoriesPanel = document.getElementById('dash-categories-panel');
-    const toggleBtn = document.getElementById('toggle-dash-view-btn');
-    if (productsPanel) productsPanel.style.display = 'grid';
-    if (categoriesPanel) categoriesPanel.style.display = 'none';
-    if (toggleBtn) toggleBtn.innerHTML = '📁 Manage Categories';
+    // Reset dashboard tabs
+    switchDashboardTab('products');
 
     // Clear session & log out automatically
     if (isOwnerLoggedIn) {
@@ -2042,27 +2037,131 @@ function populateCategoryDropdowns() {
   if (editSelect) editSelect.innerHTML = optionsHTML;
 }
 
-// Toggle Dashboard panel views (Products vs Categories)
-function toggleDashboardView() {
+// Switch between different Owner Dashboard tab panels (Products, Categories, Payments)
+function switchDashboardTab(tabName) {
   const productsPanel = document.getElementById('dash-products-panel');
   const categoriesPanel = document.getElementById('dash-categories-panel');
-  const toggleBtn = document.getElementById('toggle-dash-view-btn');
+  const paymentsPanel = document.getElementById('dash-payments-panel');
 
-  if (productsPanel && categoriesPanel && toggleBtn) {
-    if (productsPanel.style.display !== 'none') {
-      // Switch to Categories View
-      productsPanel.style.display = 'none';
-      categoriesPanel.style.display = 'grid';
-      toggleBtn.innerHTML = '📦 Manage Products';
-      renderDashboardCategories();
-    } else {
-      // Switch to Products View
-      productsPanel.style.display = 'grid';
-      categoriesPanel.style.display = 'none';
-      toggleBtn.innerHTML = '📁 Manage Categories';
-      renderDashboardProducts();
-    }
+  const tabProdBtn = document.getElementById('tab-products');
+  const tabCatBtn = document.getElementById('tab-categories');
+  const tabPayBtn = document.getElementById('tab-payments');
+
+  // Hide all panels
+  if (productsPanel) productsPanel.style.display = 'none';
+  if (categoriesPanel) categoriesPanel.style.display = 'none';
+  if (paymentsPanel) paymentsPanel.style.display = 'none';
+
+  // Remove active state from all tabs
+  if (tabProdBtn) tabProdBtn.classList.remove('active');
+  if (tabCatBtn) tabCatBtn.classList.remove('active');
+  if (tabPayBtn) tabPayBtn.classList.remove('active');
+
+  // Show selected panel & activate tab button
+  if (tabName === 'products') {
+    if (productsPanel) productsPanel.style.display = 'grid';
+    if (tabProdBtn) tabProdBtn.classList.add('active');
+    renderDashboardProducts();
+  } else if (tabName === 'categories') {
+    if (categoriesPanel) categoriesPanel.style.display = 'grid';
+    if (tabCatBtn) tabCatBtn.classList.add('active');
+    renderDashboardCategories();
+  } else if (tabName === 'payments') {
+    if (paymentsPanel) paymentsPanel.style.display = 'grid';
+    if (tabPayBtn) tabPayBtn.classList.add('active');
+    fetchDashboardPayments();
   }
+}
+
+// Fetch all payment logs from Supabase and render in list
+function fetchDashboardPayments() {
+  const container = document.getElementById('dashboard-payments-list');
+  if (!container) return;
+
+  if (!window.supabaseDb) {
+    container.innerHTML = `
+      <div style="padding:40px; text-align:center; color:var(--text-muted); font-size:0.9rem;">
+        ⚠️ Supabase cloud database is not configured. Payments tab requires a connected database.
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = `
+    <div style="padding:40px; text-align:center; color:var(--text-secondary); font-size:0.9rem;">
+      ⌛ Fetching payments log from Supabase...
+    </div>
+  `;
+
+  window.supabaseDb
+    .from('payments')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .then(({ data: list, error }) => {
+      if (error) {
+        console.error('Error fetching payments:', error.message);
+        container.innerHTML = `
+          <div style="padding:40px; text-align:center; color:#ff5f57; font-size:0.9rem;">
+            ⚠️ Error loading payments: ${error.message}
+          </div>
+        `;
+        return;
+      }
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div style="padding:40px; text-align:center; color:var(--text-muted); font-size:0.9rem;">
+            📭 No customer payments found in the database.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(pay => {
+        return `
+          <div class="dashboard-item">
+            <div class="dash-item-icon" style="background: rgba(62,207,207,0.06); border: 1px solid var(--border); overflow:hidden;">
+              <img src="${pay.screenshot}" style="width:100%; height:100%; object-fit:cover;" alt="Receipt Thumbnail"/>
+            </div>
+            <div class="dash-item-details">
+              <div class="dash-item-name" style="font-size:0.9rem;">${pay.product_name} &nbsp;•&nbsp; <strong style="color:var(--cyan);">₹${Number(pay.price).toLocaleString('en-IN')}</strong></div>
+              <div class="dash-item-meta" style="font-size:0.75rem;">Receipt ID: #${pay.id} &nbsp;•&nbsp; Date: ${new Date(pay.created_at).toLocaleString('en-IN')}</div>
+            </div>
+            <div class="dash-item-controls" style="gap:12px;">
+              <button class="btn btn-primary btn-sm" style="padding:6px 12px; font-size:0.75rem; border-radius:100px;" onclick="showPaymentReceiptModal(${JSON.stringify(pay).replace(/"/g, '&quot;')})">
+                👁️ View Screenshot
+              </button>
+              <button class="dash-btn-delete" onclick="deletePaymentRecord(${pay.id})" title="Delete Payment record" style="margin-left:4px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    });
+}
+
+// Delete payment log row from Supabase
+function deletePaymentRecord(paymentId) {
+  if (!confirm(`Are you sure you want to delete payment receipt record #${paymentId} from the database? This action cannot be undone.`)) {
+    return;
+  }
+
+  if (!window.supabaseDb) return;
+
+  window.supabaseDb
+    .from('payments')
+    .delete()
+    .eq('id', paymentId)
+    .then(({ error }) => {
+      if (error) {
+        console.error('Delete payment error:', error.message);
+        showToast('⚠️ Could not delete payment record.');
+      } else {
+        showToast(`🗑️ Payment record #${paymentId} deleted.`);
+        fetchDashboardPayments(); // Refresh list
+      }
+    });
 }
 
 // Render categories in Owner panel list

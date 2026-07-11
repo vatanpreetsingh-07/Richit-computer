@@ -1532,4 +1532,11 @@ body {
   object-fit: contain;
 }
 
+.dash-tabs button.active {
+  background: var(--gradient-main) !important;
+  color: white !important;
+  border-color: transparent !important;
+  box-shadow: 0 4px 15px rgba(108,99,255,0.3);
+}
+
 

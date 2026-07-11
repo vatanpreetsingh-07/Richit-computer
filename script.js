@@ -753,6 +753,86 @@ I have just paid ₹${product.price.toLocaleString('en-IN')} via UPI for the *${
   showToast('🟢 Transferring you to WhatsApp with order details...', 3000);
 }
 
+// Verification Modal for owner to view screenshot
+function showPaymentReceiptModal(data) {
+  let modal = document.getElementById('receipt-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'receipt-modal';
+    modal.className = 'product-modal-overlay';
+    modal.onclick = (e) => { if (e.target === modal) closeReceiptModal(); };
+    document.body.appendChild(modal);
+  }
+  
+  modal.innerHTML = `
+    <div class="product-modal-box" style="max-width: 500px; padding: 24px; position:relative;">
+      <button class="product-modal-close" onclick="closeReceiptModal()">✕</button>
+      
+      <div style="text-align:center; margin-bottom:16px;">
+        <h2 style="font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:800;color:var(--cyan);margin-bottom:4px;">🧾 Payment Receipt</h2>
+        <span style="font-size:0.75rem;color:var(--text-secondary);">Transaction verification ID: #${data.id}</span>
+      </div>
+
+      <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;margin-bottom:16px;font-size:0.85rem;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="color:var(--text-secondary);">Product Name:</span>
+          <strong style="color:var(--text-primary);">${data.product_name}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+          <span style="color:var(--text-secondary);">Amount Paid:</span>
+          <strong style="color:var(--cyan);">₹${Number(data.price).toLocaleString('en-IN')}</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="color:var(--text-secondary);">Payment Date:</span>
+          <strong style="color:var(--text-primary);">${new Date(data.created_at).toLocaleString('en-IN')}</strong>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-bottom:8px;font-size:0.8rem;color:var(--text-secondary);font-weight:700;">Uploaded Payment Screenshot</div>
+      <div style="border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:#000;display:flex;justify-content:center;align-items:center;padding:6px;">
+        <img src="${data.screenshot}" style="max-width:100%;max-height:300px;object-fit:contain;" alt="Payment Screenshot"/>
+      </div>
+
+      <button class="btn btn-primary" style="width:100%;margin-top:16px;" onclick="closeReceiptModal()">Close Receipt</button>
+    </div>
+  `;
+
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeReceiptModal() {
+  const modal = document.getElementById('receipt-modal');
+  if (modal) modal.classList.remove('open');
+  document.body.style.overflow = '';
+  
+  // Clean parameter from URL to avoid re-opening on reload
+  const url = new URL(window.location);
+  url.searchParams.delete('view_payment');
+  window.history.replaceState({}, document.title, url.pathname);
+}
+
+// Checks URL on startup for receipt ID parameters
+function checkPaymentReceipt() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const paymentId = urlParams.get('view_payment');
+  if (paymentId && window.supabaseDb) {
+    window.supabaseDb
+      .from('payments')
+      .select('*')
+      .eq('id', paymentId)
+      .single()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error('Error fetching receipt:', error.message);
+          showToast('⚠️ Could not load receipt details.');
+        } else if (data) {
+          showPaymentReceiptModal(data);
+        }
+      });
+  }
+}
+
 // =============================================
 // PRODUCT QUICK-VIEW (click image to preview)
 // =============================================

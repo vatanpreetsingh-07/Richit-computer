@@ -11,7 +11,7 @@
    ============================================================ */
 
 const SUPABASE_URL     = 'https://xhrfcoquxrdtugvbalgk.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_upI0W8oi4TcFSlTEmkhsqw_HzkfgX_F';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhocmZjb3F1eHJkdHVndmJhbGdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3NzQxNzAsImV4cCI6MjA5OTM1MDE3MH0.xfHMV-46lZAILbm2TK36f04NUGmMMVeC3CpbKUnRbLY';
 
 /* ============================================================
    DO NOT EDIT BELOW THIS LINE

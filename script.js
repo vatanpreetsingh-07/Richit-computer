@@ -636,6 +636,34 @@ function compressScreenshot(file, callback) {
   reader.readAsDataURL(file);
 }
 
+// Helper to copy base64 image data to device clipboard (converts to PNG for max browser support)
+async function copyImageToClipboard(base64Data) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob(async (pngBlob) => {
+        try {
+          if (!pngBlob) { resolve(false); return; }
+          await navigator.clipboard.write([
+            new ClipboardItem({ 'image/png': pngBlob })
+          ]);
+          resolve(true);
+        } catch (e) {
+          console.warn('Clipboard write failed:', e.message);
+          resolve(false);
+        }
+      }, 'image/png');
+    };
+    img.onerror = () => resolve(false);
+    img.src = base64Data;
+  });
+}
+
 // Compresses screenshot, writes to Supabase, constructs receipt link, redirects to WhatsApp
 function handlePaymentSubmit() {
   if (!selectedPaymentFile || !currentPaymentProductId) return;
@@ -648,37 +676,50 @@ function handlePaymentSubmit() {
   if (!p) return;
 
   compressScreenshot(selectedPaymentFile, function(base64Screenshot) {
-    if (!window.supabaseDb) {
-      // Fallback if Supabase not configured yet
-      showToast('⚠️ Supabase config missing. Opening WhatsApp...');
-      sendPaymentWhatsApp(p, null, base64Screenshot);
-      closePaymentModal();
-      return;
-    }
-
-    // Insert transaction into public 'payments' table
-    window.supabaseDb
-      .from('payments')
-      .insert([
-        {
-          product_id: p.id,
-          product_name: p.name,
-          price: p.price,
-          screenshot: base64Screenshot
-        }
-      ])
-      .select()
-      .then(({ data, error }) => {
-        if (error) {
-          console.error('Supabase write error:', error.message);
-          showToast('⚠️ Database sync failed. Opening WhatsApp directly.');
+    // Synchronously initiate clipboard copy
+    copyImageToClipboard(base64Screenshot).then(copied => {
+      if (!window.supabaseDb) {
+        // Fallback if Supabase not configured yet
+        showToast(copied 
+          ? '📋 Screenshot copied! Paste it in WhatsApp.' 
+          : '⚠️ Config missing. Opening WhatsApp...');
+        setTimeout(() => {
           sendPaymentWhatsApp(p, null, base64Screenshot);
-        } else if (data && data[0]) {
-          showToast('🎉 Receipt uploaded to cloud!');
-          sendPaymentWhatsApp(p, data[0].id, base64Screenshot);
-        }
-        closePaymentModal();
-      });
+          closePaymentModal();
+        }, 1500);
+        return;
+      }
+
+      // Insert transaction into public 'payments' table
+      window.supabaseDb
+        .from('payments')
+        .insert([
+          {
+            product_id: p.id,
+            product_name: p.name,
+            price: p.price,
+            screenshot: base64Screenshot
+          }
+        ])
+        .select()
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('Supabase write error:', error.message);
+            showToast('⚠️ Sync failed. Opening WhatsApp...');
+            setTimeout(() => {
+              sendPaymentWhatsApp(p, null, base64Screenshot);
+            }, 1000);
+          } else if (data && data[0]) {
+            showToast(copied 
+              ? '📋 Screenshot copied! Paste it in WhatsApp (Ctrl+V).' 
+              : '🎉 Receipt uploaded to cloud!');
+            setTimeout(() => {
+              sendPaymentWhatsApp(p, data[0].id, base64Screenshot);
+            }, 2000);
+          }
+          closePaymentModal();
+        });
+    });
   });
 }
 

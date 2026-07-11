@@ -708,8 +708,8 @@ Hello Richit bhai! 👋
 I have just paid ₹${product.price.toLocaleString('en-IN')} via UPI for the *${product.name}* and uploaded my payment screenshot. Please confirm my order! 🙏`;
 
   const waUrl = `https://wa.me/${OWNER_WHATSAPP}?text=${encodeURIComponent(message)}`;
-  window.open(waUrl, '_blank');
-  showToast('🟢 Opening WhatsApp with order details!', 3000);
+  window.location.href = waUrl;
+  showToast('🟢 Transferring you to WhatsApp with order details...', 3000);
 }
 
 // =============================================

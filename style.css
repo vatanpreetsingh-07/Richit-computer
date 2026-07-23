@@ -1539,4 +1539,210 @@ body {
   box-shadow: 0 4px 15px rgba(108,99,255,0.3);
 }
 
+/* ============================================
+   UI / UX PRO – MOTION GRAPHICS & FRAMER MOTION STYLES (CLEAN & PROFESSIONAL)
+   ============================================ */
+
+/* ---- Top Scroll Progress Bar ---- */
+.scroll-progress-bar {
+  position: absolute;
+  top: 0; left: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, #6C63FF 0%, #3ECFCF 100%);
+  transform-origin: 0% 50%;
+  transform: scaleX(0);
+  z-index: 1001;
+  transition: transform 0.08s linear;
+}
+
+/* ---- Hero Motion Canvas ---- */
+.hero-canvas-motion {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.65;
+}
+
+/* ---- Ambient Cursor Aura ---- */
+.cursor-aura {
+  position: fixed;
+  top: 0; left: 0;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(108, 99, 255, 0.12) 0%, rgba(62, 207, 207, 0.04) 50%, transparent 70%);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+body:hover .cursor-aura { opacity: 1; }
+
+/* ---- Floating Motion Control Widget ---- */
+.motion-control-widget {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 990;
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 6px;
+  background: rgba(15, 15, 26, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: var(--transition);
+}
+.motion-control-widget:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+}
+.motion-widget-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem; font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 100px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: var(--transition);
+}
+.motion-widget-btn:hover {
+  background: rgba(108, 99, 255, 0.15);
+  border-color: var(--purple);
+  color: #fff;
+}
+.motion-widget-btn.back-to-top {
+  padding: 7px;
+  border-radius: 50%;
+}
+.motion-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--cyan);
+  transition: var(--transition);
+}
+.motion-dot.off {
+  background: var(--text-muted);
+}
+
+/* ---- 3D Interactive Card Perspective Tilt ---- */
+.motion-tilt-card {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+  will-change: transform;
+}
+.motion-tilt-card-inner {
+  position: relative;
+  border-radius: inherit;
+  transform-style: preserve-3d;
+}
+.motion-glare-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    400px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.08),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+.motion-tilt-card:hover .motion-glare-overlay {
+  opacity: 1;
+}
+
+/* ---- Magnetic Hover Buttons ---- */
+.btn-magnetic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+  will-change: transform;
+}
+
+/* ---- SVG Vector Hover Micro-Animations ---- */
+.cat-card:hover svg,
+.product-card:hover .prod-img-box svg {
+  transform: scale(1.05) translateY(-2px);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---- Staggered Reveal Initial States ---- */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---- Modal Entrance ---- */
+.modal-spring-enter {
+  animation: modalFadePop 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@keyframes modalFadePop {
+  0% { transform: scale(0.95) translateY(12px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* ---- Quick View Lightbox Modal ---- */
+.quick-view-modal {
+  position: fixed; inset: 0; z-index: 2500;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.quick-view-modal.open {
+  opacity: 1; pointer-events: all;
+}
+.quick-view-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border-hover);
+  border-radius: var(--radius-lg);
+  max-width: 640px; width: 100%;
+  padding: 32px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+.quick-view-close {
+  position: absolute; top: 18px; right: 18px;
+  background: rgba(255,255,255,0.06); border: none;
+  color: var(--text-secondary); width: 34px; height: 34px;
+  border-radius: 50%; cursor: pointer; font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: var(--transition);
+}
+.quick-view-close:hover {
+  background: rgba(255,107,157,0.15); color: var(--pink);
+}
+
+/* ---- Hero Owner Scene Motion ---- */
+.hero-owner-photo-wrap {
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 30px rgba(108, 99, 255, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.hero-owner-scene:hover .hero-owner-photo-wrap {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(62, 207, 207, 0.3);
+}
+
+
+
 

@@ -417,7 +417,8 @@ function createProductCard(p) {
   const savings = p.oldPrice - p.price;
 
   return `
-    <div class="product-card" id="product-${p.id}" data-category="${p.category}">
+    <div class="product-card motion-tilt-card motion-tilt-card-inner reveal-on-scroll" id="product-${p.id}" data-category="${p.category}">
+      <div class="motion-glare-overlay"></div>
       <div class="product-badge ${badgeClass}">${badgeLabels[p.badge]}</div>
       <div class="product-img-wrap" onclick="openProductDetail(${p.id})" style="cursor:pointer;">
         <div class="product-img-bg" style="background: ${p.svgBg};"></div>
@@ -2314,6 +2315,261 @@ function handleFormSubmit(e) {
   }, 1500);
 }
 
+/* ============================================
+   UI / UX PRO – MOTION GRAPHICS & FRAMER MOTION MODULE
+   ============================================ */
+
+// 1. Framer Motion Scroll Progress & Reveal Controller
+function initFramerMotionEngine() {
+  const progressBar = document.getElementById('scroll-progress');
+  
+  // Track scroll position using Motion or scroll listener fallback
+  const updateScroll = () => {
+    const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = totalHeight > 0 ? window.scrollY / totalHeight : 0;
+    if (progressBar) {
+      progressBar.style.transform = `scaleX(${progress})`;
+    }
+  };
+  
+  window.addEventListener('scroll', updateScroll, { passive: true });
+  updateScroll();
+
+  // Scroll InView Staggered Reveal using Motion.inView or IntersectionObserver
+  if (window.Motion && typeof window.Motion.inView === 'function') {
+    window.Motion.inView('.reveal-on-scroll', (info) => {
+      window.Motion.animate(info.target, 
+        { opacity: [0, 1], y: [35, 0], scale: [0.96, 1] }, 
+        { duration: 0.6, easing: [0.16, 1, 0.3, 1] }
+      );
+    });
+  } else {
+    // IntersectionObserver fallback
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+  }
+}
+
+// 2. 60 FPS Canvas Hero Motion Graphics Engine
+let heroCanvasAnimId = null;
+let heroParticlesRunning = true;
+
+function initHeroCanvasMotion() {
+  const canvas = document.getElementById('motion-hero-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  let width = (canvas.width = canvas.parentElement.offsetWidth || window.innerWidth);
+  let height = (canvas.height = canvas.parentElement.offsetHeight || window.innerHeight);
+
+  window.addEventListener('resize', () => {
+    if (!canvas || !canvas.parentElement) return;
+    width = canvas.width = canvas.parentElement.offsetWidth || window.innerWidth;
+    height = canvas.height = canvas.parentElement.offsetHeight || window.innerHeight;
+  });
+
+  // Mouse repulsion coordinates
+  let mouse = { x: -1000, y: -1000, radius: 150 };
+
+  window.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+  });
+
+  const colors = ['#6C63FF', '#3ECFCF', '#FF6B9D', '#F7C948'];
+  const numParticles = Math.min(Math.floor(width / 18), 65);
+  const particles = [];
+
+  for (let i = 0; i < numParticles; i++) {
+    particles.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.7,
+      vy: (Math.random() - 0.5) * 0.7,
+      radius: Math.random() * 2.5 + 1.2,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      pulse: Math.random() * Math.PI * 2
+    });
+  }
+
+  function renderFrame() {
+    if (!heroParticlesRunning) return;
+    ctx.clearRect(0, 0, width, height);
+
+    // Render connecting energy lines
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 130) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          const opacity = (1 - dist / 130) * 0.25;
+          ctx.strokeStyle = `rgba(108, 99, 255, ${opacity})`;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Update & draw particles
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.pulse += 0.03;
+
+      if (p.x < 0 || p.x > width) p.vx *= -1;
+      if (p.y < 0 || p.y > height) p.vy *= -1;
+
+      // Mouse interactive push
+      const dx = p.x - mouse.x;
+      const dy = p.y - mouse.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < mouse.radius) {
+        const angle = Math.atan2(dy, dx);
+        const force = (mouse.radius - dist) / mouse.radius;
+        p.x += Math.cos(angle) * force * 3;
+        p.y += Math.sin(angle) * force * 3;
+      }
+
+      const r = p.radius + Math.sin(p.pulse) * 0.5;
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = p.color;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    });
+
+    heroCanvasAnimId = requestAnimationFrame(renderFrame);
+  }
+
+  renderFrame();
+
+  // Wire Ambient Motion FX Toggle Button
+  const toggleBtn = document.getElementById('toggle-ambient-btn');
+  const dot = toggleBtn ? toggleBtn.querySelector('.motion-dot') : null;
+  const btnText = document.getElementById('motion-btn-text');
+
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      heroParticlesRunning = !heroParticlesRunning;
+      if (heroParticlesRunning) {
+        if (dot) dot.classList.remove('off');
+        if (btnText) btnText.textContent = 'Motion FX';
+        renderFrame();
+      } else {
+        if (dot) dot.classList.add('off');
+        if (btnText) btnText.textContent = 'Motion OFF';
+        if (heroCanvasAnimId) cancelAnimationFrame(heroCanvasAnimId);
+        ctx.clearRect(0, 0, width, height);
+      }
+    });
+  }
+}
+
+// 3. 3D Interactive Perspective Tilt Controller
+function init3DTiltCards() {
+  const cardSelectors = '.product-card, .category-card, .feature-card, .hero-owner-scene';
+
+  document.body.addEventListener('mousemove', (e) => {
+    const card = e.target.closest(cardSelectors);
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -10;
+    const rotateY = ((x - centerX) / centerX) * 10;
+
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+    card.style.setProperty('--mx', `${(x / rect.width) * 100}%`);
+    card.style.setProperty('--my', `${(y / rect.height) * 100}%`);
+  });
+
+  document.body.addEventListener('mouseout', (e) => {
+    const card = e.target.closest(cardSelectors);
+    if (!card) return;
+    card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+  });
+}
+
+// 4. Magnetic Hover Button Motion
+function initMagneticButtons() {
+  const magneticTargets = document.querySelectorAll('.btn-primary, .btn-ghost, .owner-portal-btn, .btn-cart, .btn-search, .motion-widget-btn');
+
+  magneticTargets.forEach(btn => {
+    btn.classList.add('btn-magnetic');
+
+    btn.addEventListener('mousemove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+
+      btn.style.transform = `translate3d(${x * 0.25}px, ${y * 0.25}px, 0px) scale(1.04)`;
+    });
+
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = 'translate3d(0px, 0px, 0px) scale(1)';
+    });
+  });
+}
+
+// 5. Glowing Cursor Aura Follower
+function initCursorAura() {
+  const aura = document.getElementById('cursor-aura');
+  if (!aura) return;
+
+  let currentX = 0, currentY = 0;
+  let targetX = 0, targetY = 0;
+
+  window.addEventListener('mousemove', (e) => {
+    targetX = e.clientX;
+    targetY = e.clientY;
+  });
+
+  function updateAura() {
+    currentX += (targetX - currentX) * 0.15;
+    currentY += (targetY - currentY) * 0.15;
+    aura.style.left = `${currentX}px`;
+    aura.style.top = `${currentY}px`;
+    requestAnimationFrame(updateAura);
+  }
+
+  updateAura();
+}
+
+// 6. Kinetic Back To Top Button
+function initKineticBackToTop() {
+  const topBtn = document.getElementById('back-to-top-btn');
+  if (!topBtn) return;
+
+  topBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.Motion && typeof window.Motion.animate === 'function') {
+      window.Motion.animate(topBtn, { y: [-15, 0], scale: [1.3, 1] }, { duration: 0.5 });
+    }
+  });
+}
+
 // =============================================
 // INIT
 // =============================================
@@ -2328,6 +2584,14 @@ document.addEventListener('DOMContentLoaded', () => {
   initCounters();
   initScrollReveal();
 
+  // Initialize UI/UX Pro Motion Graphics & Framer Motion suite
+  initFramerMotionEngine();
+  initHeroCanvasMotion();
+  init3DTiltCards();
+  initMagneticButtons();
+  initCursorAura();
+  initKineticBackToTop();
+
   // Cart button from hero section
   const cartBtn = document.getElementById('cart-btn');
   if (cartBtn) cartBtn.addEventListener('click', toggleCart);
@@ -2340,3 +2604,4 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Check if user landed on payment receipt viewer link ──
   checkPaymentReceipt();
 });
+

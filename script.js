@@ -2570,6 +2570,110 @@ function initKineticBackToTop() {
   });
 }
 
+// 7. Fullscreen Scroll Motion Graphics Canvas Engine
+function initScrollMotionGraphicsEngine() {
+  const canvas = document.getElementById('scroll-motion-bg-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  let width = (canvas.width = window.innerWidth);
+  let height = (canvas.height = window.innerHeight);
+
+  window.addEventListener('resize', () => {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  });
+
+  let currentScrollY = window.scrollY;
+  let lastScrollY = window.scrollY;
+  let scrollVelocity = 0;
+
+  window.addEventListener('scroll', () => {
+    currentScrollY = window.scrollY;
+    scrollVelocity = Math.abs(currentScrollY - lastScrollY);
+    lastScrollY = currentScrollY;
+  }, { passive: true });
+
+  const geometry = [];
+  const colors = ['rgba(99, 102, 241, ', 'rgba(14, 165, 233, ', 'rgba(236, 72, 153, '];
+
+  for (let i = 0; i < 28; i++) {
+    geometry.push({
+      x: Math.random() * width,
+      y: Math.random() * height * 3,
+      size: Math.random() * 36 + 14,
+      type: Math.floor(Math.random() * 3), // 0: ring, 1: cross, 2: node
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rotSpeed: (Math.random() - 0.5) * 0.02,
+      rotation: Math.random() * Math.PI * 2
+    });
+  }
+
+  function renderScrollFrame() {
+    ctx.clearRect(0, 0, width, height);
+
+    const scrollOffsetY = currentScrollY * 0.35;
+
+    geometry.forEach((item) => {
+      const screenY = (item.y - scrollOffsetY) % (height * 1.5);
+      const drawY = screenY < -50 ? screenY + height * 1.5 : screenY;
+
+      item.rotation += item.rotSpeed + scrollVelocity * 0.001;
+
+      ctx.save();
+      ctx.translate(item.x, drawY);
+      ctx.rotate(item.rotation);
+
+      const alpha = 0.12 + Math.min(scrollVelocity * 0.004, 0.22);
+
+      if (item.type === 0) {
+        // Rotating Tech Ring
+        ctx.beginPath();
+        ctx.arc(0, 0, item.size, 0, Math.PI * 2);
+        ctx.strokeStyle = item.color + alpha + ')';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(0, 0, item.size * 0.5, 0, Math.PI * 2);
+        ctx.strokeStyle = item.color + (alpha * 0.6) + ')';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      } else if (item.type === 1) {
+        // Tech Crosshair Accent
+        ctx.strokeStyle = item.color + alpha + ')';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(-item.size / 2, 0);
+        ctx.lineTo(item.size / 2, 0);
+        ctx.moveTo(0, -item.size / 2);
+        ctx.lineTo(0, item.size / 2);
+        ctx.stroke();
+      } else {
+        // Kinetic Glowing Node
+        ctx.beginPath();
+        ctx.arc(0, 0, item.size * 0.3, 0, Math.PI * 2);
+        ctx.fillStyle = item.color + (alpha * 1.2) + ')';
+        ctx.fill();
+      }
+
+      ctx.restore();
+    });
+
+    // Animate section headers underline on scroll
+    document.querySelectorAll('.section-header, .section-title').forEach(header => {
+      const rect = header.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.85 && rect.bottom > 0) {
+        header.classList.add('is-visible');
+      }
+    });
+
+    requestAnimationFrame(renderScrollFrame);
+  }
+
+  renderScrollFrame();
+}
+
 // =============================================
 // INIT
 // =============================================
@@ -2587,6 +2691,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize UI/UX Pro Motion Graphics & Framer Motion suite
   initFramerMotionEngine();
   initHeroCanvasMotion();
+  initScrollMotionGraphicsEngine();
   init3DTiltCards();
   initMagneticButtons();
   initCursorAura();
@@ -2604,4 +2709,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Check if user landed on payment receipt viewer link ──
   checkPaymentReceipt();
 });
+
 

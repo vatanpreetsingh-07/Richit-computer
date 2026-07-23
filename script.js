@@ -2384,7 +2384,7 @@ function initHeroCanvasMotion() {
     mouse.y = e.clientY - rect.top;
   });
 
-  const colors = ['#6C63FF', '#3ECFCF', '#FF6B9D', '#F7C948'];
+  const colors = ['#6366F1', '#0EA5E9', '#EC4899', '#EAB308'];
   const numParticles = Math.min(Math.floor(width / 18), 65);
   const particles = [];
 
@@ -2415,8 +2415,8 @@ function initHeroCanvasMotion() {
           ctx.beginPath();
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
-          const opacity = (1 - dist / 130) * 0.25;
-          ctx.strokeStyle = `rgba(108, 99, 255, ${opacity})`;
+          const opacity = (1 - dist / 130) * 0.22;
+          ctx.strokeStyle = `rgba(99, 102, 241, ${opacity})`;
           ctx.lineWidth = 1;
           ctx.stroke();
         }

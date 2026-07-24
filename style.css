@@ -19,30 +19,30 @@ html {
 
 :root {
   /* Surfaces */
-  --bg-primary: #0B0C10;
-  --bg-secondary: #12141D;
-  --bg-card: #171924;
-  --bg-card-hover: #1E2030;
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #F1F5F9;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #F8FAFC;
 
   /* Borders */
-  --border: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(108, 99, 255, 0.4);
+  --border: rgba(0, 0, 0, 0.08);
+  --border-hover: rgba(99, 102, 241, 0.4);
 
   /* Accents */
-  --purple: #6C63FF;
-  --cyan: #3ECFCF;
-  --pink: #FF6B9D;
-  --gold: #F7C948;
-  --green: #28C840;
+  --purple: #6366F1;
+  --cyan: #0284C7;
+  --pink: #EC4899;
+  --gold: #D97706;
+  --green: #059669;
 
   /* Typography */
-  --text-primary: #F3F4F6;
-  --text-secondary: #9CA3AF;
-  --text-muted: #6B7280;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
 
   /* Gradients */
-  --gradient-main: linear-gradient(135deg, #6C63FF 0%, #3ECFCF 100%);
-  --gradient-hero: linear-gradient(135deg, #6C63FF 0%, #3ECFCF 50%, #FF6B9D 100%);
+  --gradient-main: linear-gradient(135deg, #6366F1 0%, #0284C7 100%);
+  --gradient-hero: linear-gradient(135deg, #4F46E5 0%, #0284C7 50%, #EC4899 100%);
 
   /* Radii */
   --radius-sm: 8px;
@@ -51,8 +51,8 @@ html {
   --radius-xl: 28px;
 
   /* Shadows */
-  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.4);
-  --shadow-hover: 0 16px 40px rgba(108, 99, 255, 0.2);
+  --shadow-card: 0 10px 30px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 16px 40px rgba(99, 102, 241, 0.14), 0 4px 12px rgba(15, 23, 42, 0.06);
 
   /* Timing */
   --transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -104,7 +104,7 @@ body {
   right: 0;
   z-index: 1000;
   padding: 14px 0;
-  background: rgba(11, 12, 16, 0.75);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
@@ -112,9 +112,9 @@ body {
 }
 
 .navbar.scrolled {
-  background: rgba(11, 12, 16, 0.95);
+  background: rgba(255, 255, 255, 0.96);
   padding: 10px 0;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
 }
 
 .nav-container {
@@ -183,7 +183,7 @@ body {
 
 .btn-search,
 .btn-cart {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border);
   color: var(--text-secondary);
   padding: 9px;
@@ -251,7 +251,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 2000;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(15, 23, 42, 0.4);
   backdrop-filter: blur(12px);
   display: flex;
   align-items: flex-start;
@@ -398,8 +398,8 @@ body {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(108, 99, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(108, 99, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
@@ -489,7 +489,7 @@ body {
 }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   color: var(--text-primary);
   border: 1px solid var(--border);
 }
@@ -565,7 +565,7 @@ body {
   transform: translateX(-50%);
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(108, 99, 255, 0.3) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%);
   border-radius: 50%;
   z-index: 0;
   pointer-events: none;
@@ -602,8 +602,8 @@ body {
   height: 280px;
   border-radius: var(--radius-xl);
   overflow: hidden;
-  border: 2px solid rgba(108, 99, 255, 0.4);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
 }
 
 .hero-owner-photo {
@@ -706,7 +706,7 @@ body {
 /* Floating status cards */
 .floating-card {
   position: absolute;
-  background: rgba(23, 25, 36, 0.95);
+  background: rgba(255, 255, 255, 0.94);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 10px 14px;
@@ -927,7 +927,7 @@ body {
 
 .filter-btn {
   padding: 9px 20px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border);
   color: var(--text-secondary);
   border-radius: 100px;
@@ -1141,7 +1141,7 @@ body {
 
 .btn-wishlist {
   padding: 9px 11px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border);
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
@@ -1391,8 +1391,8 @@ body {
   height: 100%;
   border-radius: var(--radius-xl);
   overflow: hidden;
-  border: 2px solid rgba(108, 99, 255, 0.4);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  border: 2px solid rgba(99, 102, 241, 0.3);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
   background: var(--bg-card);
 }
 
@@ -1775,7 +1775,7 @@ body {
   width: 36px;
   height: 36px;
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border);
   color: var(--text-secondary);
   display: flex;
@@ -1842,7 +1842,7 @@ body {
 .product-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(15, 23, 42, 0.4);
   z-index: 2500;
   opacity: 0;
   pointer-events: none;
@@ -1893,7 +1893,7 @@ body {
 }
 
 .cart-close-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border);
   color: var(--text-primary);
   padding: 6px 10px;
@@ -1991,7 +1991,7 @@ body {
   font-weight: 600;
   color: var(--text-secondary);
   text-decoration: none;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border);
   padding: 7px 14px;
   border-radius: 100px;
@@ -2012,7 +2012,7 @@ body {
   border: 1px solid var(--border-hover);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.15);
   width: 100%;
   transition: var(--transition);
 }
@@ -2027,7 +2027,7 @@ body {
   position: absolute;
   top: 14px;
   right: 14px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border);
   color: var(--text-secondary);
   width: 30px;
@@ -2100,7 +2100,7 @@ body {
 .dashboard-product-list {
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.02);
   max-height: 380px;
   overflow-y: auto;
   display: flex;
@@ -2225,7 +2225,7 @@ body {
 }
 
 .upi-app-btn {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(0, 0, 0, 0.03);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 9px;
@@ -2256,7 +2256,7 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(0, 0, 0, 0.02);
   border: 1px dashed var(--border);
   border-radius: var(--radius-md);
   margin: 6px 0;
@@ -2273,7 +2273,7 @@ body {
 }
 
 .screenshot-upload-box {
-  background: rgba(255, 255, 255, 0.01);
+  background: rgba(99, 102, 241, 0.03);
   border: 1.5px dashed rgba(108, 99, 255, 0.3);
   border-radius: var(--radius-md);
   padding: 16px;
@@ -2294,7 +2294,7 @@ body {
   border-radius: var(--radius-sm);
   overflow: hidden;
   max-height: 150px;
-  background: #000;
+  background: #f1f5f9;
   justify-content: center;
   align-items: center;
   padding: 4px;
@@ -2361,16 +2361,16 @@ body:hover .cursor-aura {
   align-items: center;
   gap: 6px;
   padding: 4px 6px;
-  background: rgba(18, 20, 29, 0.85);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border);
   border-radius: 100px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
 }
 
 .motion-widget-btn {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.04);
   border: 1px solid var(--border);
   color: var(--text-primary);
   font-family: 'Outfit', sans-serif;
@@ -2451,7 +2451,7 @@ body:hover .cursor-aura {
   position: fixed;
   inset: 0;
   z-index: 2500;
-  background: rgba(11, 12, 16, 0.85);
+  background: rgba(255, 255, 255, 0.6);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   display: flex;
@@ -2470,13 +2470,13 @@ body:hover .cursor-aura {
 
 .quick-view-box {
   background: var(--bg-card);
-  border: 1px solid var(--border-hover);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   max-width: 600px;
   width: 100%;
   padding: 28px;
   position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
 
 /* --------------------------------------------
@@ -2547,7 +2547,7 @@ body:hover .cursor-aura {
     top: 60px;
     left: 0;
     right: 0;
-    background: rgba(11, 12, 16, 0.98);
+    background: rgba(255, 255, 255, 0.98);
     padding: 20px;
     border-bottom: 1px solid var(--border);
     backdrop-filter: blur(16px);
